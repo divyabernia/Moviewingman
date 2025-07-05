@@ -58,13 +58,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 bg-red-950/30 border border-red-800/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 transition-all duration-200"
                 placeholder="Enter your email"
-                className={`h-12 sm:h-16 md:h-20 w-auto brightness-150 contrast-125 saturate-110 transition-opacity duration-300 ${
-                  logoLoaded ? 'opacity-100' : 'opacity-0'
-                }`}
-                onLoad={() => setLogoLoaded(true)}
-                loading="eager"
+                required
               />
-            </div>
             </div>
 
             <div>
