@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { searchMoviesIMDb, getTrendingMoviesIMDb, getMovieDetailsIMDb } from './imdb';
 
 const OMDB_API_KEY = 'b00a7e04';
-const OMDB_BASE_URL = 'https://www.omdbapi.com/';
+const OMDB_BASE_URL = 'http://www.omdbapi.com/';
 
 const omdbApi = axios.create({
   baseURL: OMDB_BASE_URL,
@@ -102,17 +103,55 @@ export const searchMovies = async (query: string): Promise<any[]> => {
     
     if (response.data.Error) {
       console.warn('OMDb API Error:', response.data.Error);
+      
+      // Try IMDb as backup
+      console.log('Trying IMDb as backup...');
+      try {
+        const imdbResults = await searchMoviesIMDb(query);
+        if (imdbResults.length > 0) {
+          console.log('Found results from IMDb backup');
+          return imdbResults;
+        }
+      } catch (imdbError) {
+        console.warn('IMDb backup also failed:', imdbError);
+      }
     }
     
     return [];
   } catch (error) {
     console.error('Error searching movies:', error);
-    throw new Error('Failed to search movies. Please check your internet connection.');
+    
+    // Try IMDb as backup
+    console.log('OMDb failed, trying IMDb as backup...');
+    try {
+      const imdbResults = await searchMoviesIMDb(query);
+      if (imdbResults.length > 0) {
+        console.log('Successfully got results from IMDb backup');
+        return imdbResults;
+      }
+    } catch (imdbError) {
+      console.error('IMDb backup also failed:', imdbError);
+    }
+    
+    throw new Error('Failed to search movies from both OMDb and IMDb. Please check your internet connection.');
   }
 };
 
 export const getTrendingMovies = async (): Promise<any[]> => {
-  // Since OMDb doesn't have trending, we'll search for popular movies
+  try {
+    // Try IMDb first for trending movies since it has better trending data
+    console.log('Fetching trending movies from IMDb...');
+    const imdbResults = await getTrendingMoviesIMDb();
+    
+    if (imdbResults.length > 0) {
+      console.log('Successfully got trending movies from IMDb');
+      return imdbResults;
+    }
+  } catch (error) {
+    console.warn('IMDb trending failed, falling back to OMDb popular movies:', error);
+  }
+  
+  // Fallback to OMDb popular movies
   const popularMovies = [
     'Avengers Endgame', 'Spider-Man', 'The Dark Knight', 'Inception', 'Interstellar',
     'The Matrix', 'Pulp Fiction', 'The Godfather', 'Forrest Gump', 'Titanic',
@@ -121,7 +160,7 @@ export const getTrendingMovies = async (): Promise<any[]> => {
   ];
   
   try {
-    console.log('Fetching trending movies...');
+    console.log('Fetching popular movies from OMDb...');
     const moviePromises = popularMovies.slice(0, 15).map(async (title, index) => {
       try {
         const response = await omdbApi.get('', {
@@ -144,7 +183,7 @@ export const getTrendingMovies = async (): Promise<any[]> => {
     const results = await Promise.all(moviePromises);
     const validResults = results.filter(movie => movie !== null);
     
-    console.log('Trending movies fetched:', validResults.length);
+    console.log('Popular movies fetched from OMDb:', validResults.length);
     return validResults;
   } catch (error) {
     console.error('Error fetching trending movies:', error);
@@ -196,10 +235,29 @@ export const getMovieDetails = async (movieId: number): Promise<any> => {
       };
     }
     
-    throw new Error('Movie not found');
+    // If OMDb fails, try IMDb as backup
+    console.log('OMDb failed, trying IMDb for movie details...');
+    try {
+      const imdbDetails = await getMovieDetailsIMDb(movieId);
+      console.log('Successfully got movie details from IMDb backup');
+      return imdbDetails;
+    } catch (imdbError) {
+      console.error('IMDb backup also failed:', imdbError);
+      throw new Error('Movie not found in both OMDb and IMDb');
+    }
   } catch (error) {
     console.error('Error fetching movie details:', error);
-    throw new Error('Failed to fetch movie details. Please try again.');
+    
+    // Try IMDb as backup
+    console.log('OMDb error, trying IMDb as backup...');
+    try {
+      const imdbDetails = await getMovieDetailsIMDb(movieId);
+      console.log('Successfully got movie details from IMDb backup');
+      return imdbDetails;
+    } catch (imdbError) {
+      console.error('IMDb backup also failed:', imdbError);
+      throw new Error('Failed to fetch movie details from both OMDb and IMDb. Please try again.');
+    }
   }
 };
 
