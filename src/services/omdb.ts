@@ -1,12 +1,12 @@
 import axios from 'axios';
 import { searchMoviesTMDb, getTrendingMoviesTMDb, getMovieDetailsTMDb, getPersonDetailsTMDb, getTMDbImageUrl } from './tmdb';
 
-const OMDB_API_KEY = import.meta.env.VITE_OMDB_API_KEY;
+const OMDB_API_KEY = import.meta.env.VITE_OMDB_API_KEY || 'b00a7e04';
 const OMDB_BASE_URL = 'http://www.omdbapi.com/';
 
 // Check if OMDb API key is available
 const hasValidOMDbKey = () => {
-  return OMDB_API_KEY && OMDB_API_KEY !== 'your_omdb_api_key_here';
+  return OMDB_API_KEY && OMDB_API_KEY !== 'your_omdb_api_key_here' && OMDB_API_KEY.length > 5;
 };
 
 const omdbApi = axios.create({
