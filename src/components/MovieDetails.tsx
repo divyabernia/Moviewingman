@@ -60,13 +60,13 @@ export const MovieDetails: React.FC<MovieDetailsProps> = ({
               
               <button
                 onClick={handleClose}
-                className="absolute top-6 right-6 w-12 h-12 bg-black/50 backdrop-blur-sm text-white rounded-xl flex items-center justify-center hover:bg-black/70 transition-all duration-200 hover:scale-110 border border-red-800/30"
+                className="absolute top-6 right-6 w-12 h-12 bg-black/80 backdrop-blur-sm text-white rounded-xl flex items-center justify-center hover:bg-red-600/80 transition-all duration-200 hover:scale-110 border border-red-800/30 z-20 cursor-pointer"
               >
                 <X className="w-6 h-6" />
               </button>
 
               {/* Play Button Overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center z-10">
                 <button className="w-20 h-20 bg-red-600/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-red-600 transition-all duration-200 transform hover:scale-110 shadow-lg shadow-red-500/25">
                   <Play className="w-10 h-10 text-white fill-current ml-1" />
                 </button>
