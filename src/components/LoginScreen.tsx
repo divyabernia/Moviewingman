@@ -22,17 +22,16 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div className="relative w-16 h-16 bg-gradient-to-r from-red-600 to-red-500 rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/25">
-              <Heart className="w-8 h-8 text-white fill-current" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Play className="w-6 h-6 text-white fill-current ml-1" />
-              </div>
-            </div>
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4">
+            <img 
+              src="/WhatsApp Image 2025-07-05 at 16.59.28.jpeg" 
+              alt="CineVault Logo" 
+              className="h-12 sm:h-16 md:h-20 w-auto brightness-150 contrast-125 saturate-110"
+            />
+            <span className="text-2xl sm:text-3xl md:text-4xl font-black bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent">
+              CineVault
+            </span>
           </div>
-          <h1 className="text-4xl font-black bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent">
-            CineVault
-          </h1>
           <p className="text-gray-300 mt-2">Your ultimate movie watchlist</p>
         </div>
 
