@@ -28,6 +28,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
               {!logoLoaded && (
                 <div className="h-12 sm:h-16 md:h-20 w-12 sm:w-16 md:w-20 bg-gray-700 animate-pulse rounded" />
               )}
+            </div>
             <img 
               src="/WhatsApp Image 2025-07-05 at 16.59.28.jpeg" 
               alt="CineVault Logo" 
