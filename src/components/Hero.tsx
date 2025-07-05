@@ -41,16 +41,27 @@ export const Hero: React.FC<HeroProps> = ({
   onShowSmartRecommendations,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [backgroundLoaded, setBackgroundLoaded] = useState(false);
 
   useEffect(() => {
     if (trendingMovies.length === 0) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % trendingMovies.length);
+      setBackgroundLoaded(false); // Reset loading state when changing background
     }, 6000);
 
     return () => clearInterval(interval);
   }, [trendingMovies.length]);
+
+  useEffect(() => {
+    if (trendingMovies.length > 0) {
+      // Preload the current background image
+      const img = new Image();
+      img.onload = () => setBackgroundLoaded(true);
+      img.src = getImageUrl(trendingMovies[currentIndex].backdrop_path);
+    }
+  }, [currentIndex, trendingMovies]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,8 +127,17 @@ export const Hero: React.FC<HeroProps> = ({
 
   return (
     <div className="relative min-h-[70vh] sm:min-h-[80vh] lg:min-h-[85vh] overflow-hidden">
+      {/* Background placeholder */}
+      <div className="absolute inset-0 bg-gray-900">
+        {!backgroundLoaded && (
+          <div className="absolute inset-0 bg-gradient-to-r from-red-900 via-red-950 to-black animate-pulse" />
+        )}
+      </div>
+      
       <div 
-        className="absolute inset-0 bg-cover bg-center transition-all duration-1000 scale-105"
+        className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 scale-105 ${
+          backgroundLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
         style={{
           backgroundImage: `url(${getImageUrl(currentMovie.backdrop_path)})`,
         }}

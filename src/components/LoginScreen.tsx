@@ -10,6 +10,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [logoLoaded, setLogoLoaded] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +24,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4">
+            <div className="relative h-12 sm:h-16 md:h-20 w-auto">
+              {!logoLoaded && (
+                <div className="h-12 sm:h-16 md:h-20 w-12 sm:w-16 md:w-20 bg-gray-700 animate-pulse rounded" />
+              )}
             <img 
               src="/WhatsApp Image 2025-07-05 at 16.59.28.jpeg" 
               alt="CineVault Logo" 
@@ -53,8 +58,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 bg-red-950/30 border border-red-800/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 transition-all duration-200"
                 placeholder="Enter your email"
-                required
+                className={`h-12 sm:h-16 md:h-20 w-auto brightness-150 contrast-125 saturate-110 transition-opacity duration-300 ${
+                  logoLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+                onLoad={() => setLogoLoaded(true)}
+                loading="eager"
               />
+            </div>
             </div>
 
             <div>

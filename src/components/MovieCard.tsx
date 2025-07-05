@@ -20,21 +20,42 @@ export const MovieCard: React.FC<MovieCardProps> = ({
   showRemoveButton = false,
   onSocialAdd,
 }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     e.currentTarget.src = 'https://via.placeholder.com/300x450/111111/666666?text=No+Image';
+    setImageError(true);
+    setImageLoaded(true);
+  };
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
   };
 
   return (
     <div className="group relative">
       <div className="bg-black/50 backdrop-blur-sm rounded-lg sm:rounded-xl overflow-hidden border border-red-800/30 hover:border-red-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-red-500/10 transform hover:scale-105">
         <div className="relative overflow-hidden">
+          {/* Image placeholder to prevent layout shift */}
+          <div className="w-full h-64 sm:h-80 md:h-96 bg-gray-800 flex items-center justify-center">
+            {!imageLoaded && !imageError && (
+              <div className="animate-pulse bg-gray-700 w-full h-full flex items-center justify-center">
+                <div className="text-gray-500 text-sm">Loading...</div>
+              </div>
+            )}
           <img
             src={getImageUrl(movie.poster_path)}
             alt={movie.title}
             onError={handleImageError}
-            className="w-full h-64 sm:h-80 md:h-96 object-cover group-hover:scale-110 transition-transform duration-500 cursor-pointer"
+              onLoad={handleImageLoad}
+              className={`absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-all duration-500 cursor-pointer ${
+                imageLoaded ? 'opacity-100' : 'opacity-0'
+              }`}
             onClick={() => onMovieClick(movie.id)}
+              loading="lazy"
           />
+          </div>
           
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           
