@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Star, Calendar, Clock, Plus, Trash2, Play, Users, Award, Globe, DollarSign, Trophy, Film } from 'lucide-react';
+import { X, Star, Calendar, Clock, Plus, Trash2, Play, Award, Globe, DollarSign, Trophy, Film } from 'lucide-react';
 import { MovieDetails as MovieDetailsType, Movie } from '../types/movie';
 import { getImageUrl, getYear, formatRuntime } from '../services/omdb';
 import { OMDbMovie } from '../services/omdb';
@@ -36,6 +36,12 @@ export const MovieDetails: React.FC<MovieDetailsProps> = ({
     onToggleWatchlist(movieData);
   };
 
+  const handleClose = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 overflow-y-auto">
       <div className="min-h-screen py-8">
@@ -53,7 +59,7 @@ export const MovieDetails: React.FC<MovieDetailsProps> = ({
               <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent" />
               
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="absolute top-6 right-6 w-12 h-12 bg-black/50 backdrop-blur-sm text-white rounded-xl flex items-center justify-center hover:bg-black/70 transition-all duration-200 hover:scale-110 border border-red-800/30"
               >
                 <X className="w-6 h-6" />
