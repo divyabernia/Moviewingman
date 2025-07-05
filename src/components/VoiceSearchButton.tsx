@@ -39,10 +39,13 @@ export const VoiceSearchButton: React.FC<VoiceSearchButtonProps> = ({
           const transcription = await transcribeAudio(audioBlob);
           console.log('Transcription received:', transcription);
           if (transcription.trim()) {
+            console.log('Calling onTranscription with:', transcription.trim());
             onTranscription(transcription.trim());
           } else {
             setTranscriptionError('No speech detected. Please try again.');
           }
+          // Clear any previous errors on successful transcription
+          setTranscriptionError(null);
         } else {
           setTranscriptionError('No audio recorded. Please try again.');
         }

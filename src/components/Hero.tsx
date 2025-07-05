@@ -26,18 +26,16 @@ export const Hero: React.FC<HeroProps> = ({ trendingMovies, onMovieClick }) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Trigger search by dispatching custom event
-      const searchEvent = new CustomEvent('heroSearch', { detail: searchQuery });
-      window.dispatchEvent(searchEvent);
-      setSearchQuery(''); // Clear the search input after submitting
+      // Trigger search by calling the parent's search handler
+      onMovieClick && window.dispatchEvent(new CustomEvent('heroSearch', { detail: searchQuery }));
     }
   };
 
   const handleVoiceTranscription = (transcription: string) => {
     if (transcription.trim()) {
-      // Auto-trigger search after voice input
-      const searchEvent = new CustomEvent('heroSearch', { detail: transcription });
-      window.dispatchEvent(searchEvent);
+      // Set the search query and trigger search
+      setSearchQuery(transcription);
+      window.dispatchEvent(new CustomEvent('heroSearch', { detail: transcription }));
     }
   };
 
@@ -95,7 +93,7 @@ export const Hero: React.FC<HeroProps> = ({ trendingMovies, onMovieClick }) => {
           <div className="max-w-4xl">
             {/* Search Bar */}
             <div className="mb-8">
-              <form onSubmit={handleSearch} className="max-w-2xl">
+              <form onSubmit={handleSearch} className="max-w-2xl relative">
                 <div className="relative">
                   <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
                   <input
@@ -103,11 +101,25 @@ export const Hero: React.FC<HeroProps> = ({ trendingMovies, onMovieClick }) => {
                     placeholder="Search for movies, actors, directors..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-16 pr-6 py-5 bg-black/40 backdrop-blur-sm border border-red-800/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 transition-all duration-200 text-lg"
+                    className="w-full pl-16 pr-32 py-5 bg-black/40 backdrop-blur-sm border border-red-800/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 transition-all duration-200 text-lg"
                   />
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <div className="absolute right-16 top-1/2 transform -translate-y-1/2">
                     <VoiceSearchButton onTranscription={handleVoiceTranscription} />
                   </div>
+                  <button
+                    type="submit"
+                    disabled={!searchQuery.trim()}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-xl flex items-center justify-center hover:from-red-700 hover:to-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg shadow-red-500/25"
+                  >
+                    <Search className="w-5 h-5" />
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!searchQuery.trim()}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-xl flex items-center justify-center hover:from-red-700 hover:to-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg shadow-red-500/25"
+                  >
+                    <Search className="w-5 h-5" />
+                  </button>
                 </div>
               </form>
             </div>
