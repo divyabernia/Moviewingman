@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Home, TrendingUp, BookOpen, LogOut, Users, Menu } from 'lucide-react';
 
 interface HeaderProps {
