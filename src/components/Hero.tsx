@@ -187,13 +187,6 @@ export const Hero: React.FC<HeroProps> = ({
                 <Play className="w-6 h-6" />
                 Watch Trailer
               </button>
-              <button
-                onClick={onShowAISommelier}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transform hover:scale-105"
-              >
-                <Sparkles className="w-6 h-6" />
-                AI Sommelier
-              </button>
             </div>
 
             {/* Quick AI Features */}
