@@ -55,6 +55,19 @@ function App() {
   useEffect(() => {
     if (isLoggedIn) {
       loadTrendingMovies();
+      
+      // Listen for hero search events
+      const handleHeroSearch = (event: CustomEvent) => {
+        const query = event.detail;
+        setSearchQuery(query);
+        setCurrentView('search');
+      };
+      
+      window.addEventListener('heroSearch', handleHeroSearch as EventListener);
+      
+      return () => {
+        window.removeEventListener('heroSearch', handleHeroSearch as EventListener);
+      };
     }
   }, [loadTrendingMovies, isLoggedIn]);
 

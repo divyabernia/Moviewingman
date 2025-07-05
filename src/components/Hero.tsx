@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Info, Star, Calendar, Search } from 'lucide-react';
+import { VoiceSearchButton } from './VoiceSearchButton';
 import { Movie } from '../types/movie';
 import { getImageUrl, getYear } from '../services/omdb';
 
@@ -25,9 +26,17 @@ export const Hero: React.FC<HeroProps> = ({ trendingMovies, onMovieClick }) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // This will trigger the search functionality
-      window.dispatchEvent(new CustomEvent('search', { detail: searchQuery }));
+      // Trigger search by dispatching custom event
+      const searchEvent = new CustomEvent('heroSearch', { detail: searchQuery });
+      window.dispatchEvent(searchEvent);
     }
+  };
+
+  const handleVoiceTranscription = (transcription: string) => {
+    setSearchQuery(transcription);
+    // Auto-trigger search after voice input
+    const searchEvent = new CustomEvent('heroSearch', { detail: transcription });
+    window.dispatchEvent(searchEvent);
   };
 
   if (trendingMovies.length === 0) {
@@ -70,6 +79,9 @@ export const Hero: React.FC<HeroProps> = ({ trendingMovies, onMovieClick }) => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-16 pr-6 py-5 bg-black/40 backdrop-blur-sm border border-red-800/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 transition-all duration-200 text-lg"
                   />
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                    <VoiceSearchButton onTranscription={handleVoiceTranscription} />
+                  </div>
                 </div>
               </form>
             </div>

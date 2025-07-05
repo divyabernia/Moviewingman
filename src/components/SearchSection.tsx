@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Sparkles, AlertCircle } from 'lucide-react';
+import { VoiceSearchButton } from './VoiceSearchButton';
 import { MovieGrid } from './MovieGrid';
 import { Movie } from '../types/movie';
 
@@ -24,6 +25,10 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
   onToggleWatchlist,
   onMovieClick,
 }) => {
+  const handleVoiceTranscription = (transcription: string) => {
+    onQueryChange(transcription);
+  };
+
   return (
     <section>
       <div className="text-center mb-16">
@@ -43,10 +48,13 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
               placeholder="Search for movies, actors, directors..."
               value={searchQuery}
               onChange={(e) => onQueryChange(e.target.value)}
-              className="w-full pl-14 pr-14 py-5 bg-red-950/30 border border-red-800/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 backdrop-blur-sm transition-all duration-200 text-lg"
+              className="w-full pl-14 pr-20 py-5 bg-red-950/30 border border-red-800/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 backdrop-blur-sm transition-all duration-200 text-lg"
             />
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+              <VoiceSearchButton onTranscription={handleVoiceTranscription} />
+            </div>
             {loading && (
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+              <div className="absolute right-20 top-1/2 transform -translate-y-1/2">
                 <div className="animate-spin rounded-full h-6 w-6 border-2 border-red-500 border-t-transparent"></div>
               </div>
             )}
