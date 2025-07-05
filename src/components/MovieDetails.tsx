@@ -263,10 +263,19 @@ export const MovieDetails: React.FC<MovieDetailsProps> = ({
                     )}
 
                     {movie.production_companies && movie.production_companies.length > 0 && (
+                      <div className="bg-red-900/20 backdrop-blur-sm p-6 rounded-xl border border-red-800/30">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Film className="w-5 h-5 text-blue-400" />
+                          <h4 className="font-bold text-white">Production Companies</h4>
+                        </div>
+                        <p className="text-gray-300">
+                          {movie.production_companies.map(company => company.name).join(', ')}
                         </p>
                       </div>
                     )}
-
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
