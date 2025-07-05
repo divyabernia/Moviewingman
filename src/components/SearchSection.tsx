@@ -28,7 +28,13 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
   onMovieClick,
 }) => {
   const handleVoiceTranscription = (transcription: string) => {
-    onQueryChange(transcription);
+    if (transcription.trim()) {
+      onQueryChange(transcription);
+      // Trigger search immediately after voice input
+      setTimeout(() => {
+        onManualSearch();
+      }, 100);
+    }
   };
 
   return (

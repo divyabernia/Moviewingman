@@ -34,9 +34,11 @@ export const Hero: React.FC<HeroProps> = ({ trendingMovies, onMovieClick }) => {
   };
 
   const handleVoiceTranscription = (transcription: string) => {
-    // Auto-trigger search after voice input
-    const searchEvent = new CustomEvent('heroSearch', { detail: transcription });
-    window.dispatchEvent(searchEvent);
+    if (transcription.trim()) {
+      // Auto-trigger search after voice input
+      const searchEvent = new CustomEvent('heroSearch', { detail: transcription });
+      window.dispatchEvent(searchEvent);
+    }
   };
 
   if (trendingMovies.length === 0) {

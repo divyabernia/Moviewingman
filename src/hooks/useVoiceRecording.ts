@@ -27,14 +27,29 @@ export const useVoiceRecording = (): UseVoiceRecordingReturn => {
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          sampleRate: 16000,
+          sampleRate: 44100,
         } 
       });
 
       // Create MediaRecorder instance
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
-      });
+      let mediaRecorder: MediaRecorder;
+      
+      // Try different MIME types for better compatibility
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        mediaRecorder = new MediaRecorder(stream, {
+          mimeType: 'audio/webm;codecs=opus'
+        });
+      } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+        mediaRecorder = new MediaRecorder(stream, {
+          mimeType: 'audio/webm'
+        });
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        mediaRecorder = new MediaRecorder(stream, {
+          mimeType: 'audio/mp4'
+        });
+      } else {
+        mediaRecorder = new MediaRecorder(stream);
+      }
 
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
@@ -42,14 +57,17 @@ export const useVoiceRecording = (): UseVoiceRecordingReturn => {
       // Handle data available event
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
+          console.log('Audio chunk received:', event.data.size, 'bytes');
           audioChunksRef.current.push(event.data);
         }
       };
 
       // Start recording
-      mediaRecorder.start(100); // Collect data every 100ms
+      mediaRecorder.start(1000); // Collect data every second for better chunks
       setIsRecording(true);
       setIsProcessing(false);
+      
+      console.log('Recording started with MIME type:', mediaRecorder.mimeType);
     } catch (err) {
       console.error('Error starting recording:', err);
       setError('Failed to access microphone. Please check permissions.');
@@ -69,8 +87,10 @@ export const useVoiceRecording = (): UseVoiceRecordingReturn => {
       mediaRecorderRef.current.onstop = () => {
         // Create audio blob from chunks
         const audioBlob = new Blob(audioChunksRef.current, { 
-          type: 'audio/webm;codecs=opus' 
+          type: mediaRecorderRef.current?.mimeType || 'audio/webm'
         });
+        
+        console.log('Recording stopped. Audio blob created:', audioBlob.size, 'bytes, type:', audioBlob.type);
 
         // Stop all tracks to release microphone
         if (mediaRecorderRef.current?.stream) {

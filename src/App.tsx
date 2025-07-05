@@ -121,6 +121,12 @@ function App() {
       if (currentView !== 'search') {
         setCurrentView('search');
       }
+      // Auto-search after a short delay for voice input
+      const timeoutId = setTimeout(() => {
+        handleSearch(query);
+      }, 500);
+      
+      return () => clearTimeout(timeoutId);
     }
   };
 

@@ -28,18 +28,23 @@ export const VoiceSearchButton: React.FC<VoiceSearchButtonProps> = ({
     if (isRecording) {
       // Stop recording and transcribe
       try {
+        console.log('Stopping recording and starting transcription...');
         setIsTranscribing(true);
         setTranscriptionError(null);
         
         const audioBlob = await stopRecording();
         
         if (audioBlob) {
+          console.log('Audio blob received for transcription:', audioBlob.size, 'bytes');
           const transcription = await transcribeAudio(audioBlob);
+          console.log('Transcription received:', transcription);
           if (transcription.trim()) {
             onTranscription(transcription.trim());
           } else {
             setTranscriptionError('No speech detected. Please try again.');
           }
+        } else {
+          setTranscriptionError('No audio recorded. Please try again.');
         }
       } catch (error) {
         console.error('Transcription error:', error);
@@ -49,6 +54,7 @@ export const VoiceSearchButton: React.FC<VoiceSearchButtonProps> = ({
       }
     } else {
       // Start recording
+      console.log('Starting voice recording...');
       clearError();
       setTranscriptionError(null);
       await startRecording();
