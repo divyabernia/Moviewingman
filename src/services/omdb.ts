@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { searchMoviesTMDb, getTrendingMoviesTMDb, getMovieDetailsTMDb, getPersonDetailsTMDb, getTMDbImageUrl } from './tmdb';
 
-const OMDB_API_KEY = 'b00a7e04';
+const OMDB_API_KEY = import.meta.env.VITE_OMDB_API_KEY || 'b00a7e04';
 const OMDB_BASE_URL = 'http://www.omdbapi.com/';
 
 const omdbApi = axios.create({

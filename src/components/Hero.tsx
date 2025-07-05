@@ -16,6 +16,7 @@ interface HeroProps {
   onQueryChange: (query: string) => void;
   onToggleWatchlist: (movie: Movie) => void;
   showSearchResults: boolean;
+  onSetShowSearchResults: (value: boolean) => void;
   onSocialAdd: (movie: Movie) => void;
   onShowAISommelier: () => void;
   onShowMovieDNA: () => void;
@@ -33,6 +34,7 @@ export const Hero: React.FC<HeroProps> = ({
   onQueryChange,
   onToggleWatchlist,
   showSearchResults,
+  onSetShowSearchResults,
   onSocialAdd,
   onShowAISommelier,
   onShowMovieDNA,
@@ -250,7 +252,7 @@ export const Hero: React.FC<HeroProps> = ({
               <button
                 onClick={() => {
                   onQueryChange('');
-                  setShowSearchResults && setShowSearchResults(false);
+                  onSetShowSearchResults(false);
                 }}
                 className="mt-4 px-6 py-2 bg-red-600/20 border border-red-500/30 text-red-300 rounded-xl hover:bg-red-600/30 transition-all duration-200"
               >

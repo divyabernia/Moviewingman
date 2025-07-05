@@ -282,6 +282,7 @@ function App() {
               onQueryChange={handleQueryChange}
               onToggleWatchlist={handleToggleWatchlist}
               showSearchResults={showSearchResults}
+              onSetShowSearchResults={setShowSearchResults}
               onSocialAdd={handleSocialAdd}
               onShowAISommelier={() => setShowAISommelier(true)}
               onShowMovieDNA={() => setShowMovieDNA(true)}
