@@ -222,6 +222,19 @@ export const SocialWatchlistView: React.FC<SocialWatchlistViewProps> = ({
                   </span>
                 </div>
               </div>
+                {/* Delete Button */}
+                <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRemoveFromWatchlist(movie.id);
+                    }}
+                    className="w-12 h-12 bg-red-600/90 backdrop-blur-sm text-white rounded-xl flex items-center justify-center hover:bg-red-700/90 transition-all duration-200 transform hover:scale-110 border border-red-500/50 shadow-lg shadow-red-500/25"
+                    title="Remove from social watchlist"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
 
               <div className="p-4">
                 <h3 
