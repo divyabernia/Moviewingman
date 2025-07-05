@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Info, Star, Calendar, Search, Sparkles, Brain, Zap } from 'lucide-react';
+import { Play, Info, Star, Calendar, Search, Sparkles, Brain, Zap, X } from 'lucide-react';
 import { VoiceSearchButton } from './VoiceSearchButton';
 import { MovieGrid } from './MovieGrid';
 import { Movie } from '../types/movie';
@@ -215,6 +215,14 @@ export const Hero: React.FC<HeroProps> = ({
       {/* Dynamic Search Results */}
       {showSearchResults && searchQuery.trim() && (
         <div className="absolute inset-0 bg-black/95 backdrop-blur-xl z-40 overflow-y-auto">
+          {/* Close Button */}
+          <button
+            onClick={() => onQueryChange('')}
+            className="fixed top-6 right-6 w-12 h-12 bg-black/50 backdrop-blur-sm text-white rounded-xl flex items-center justify-center hover:bg-black/70 transition-all duration-200 hover:scale-110 border border-red-800/30 z-50"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          
           <div className="container mx-auto px-4 py-8 pt-24">
             <div className="text-center mb-8">
               <h3 className="text-3xl font-bold text-white mb-4">
@@ -240,7 +248,10 @@ export const Hero: React.FC<HeroProps> = ({
               )}
               
               <button
-                onClick={() => onQueryChange('')}
+                onClick={() => {
+                  onQueryChange('');
+                  setShowSearchResults && setShowSearchResults(false);
+                }}
                 className="mt-4 px-6 py-2 bg-red-600/20 border border-red-500/30 text-red-300 rounded-xl hover:bg-red-600/30 transition-all duration-200"
               >
                 Clear Search
