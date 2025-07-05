@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => setCurrentView('home')}
           >
             <img 
-              src="/WhatsApp Image 2025-07-05 at 17.00.17.jpeg" 
+              src="/WhatsApp Image 2025-07-05 at 16.59.28.jpeg" 
               alt="CineVault Logo" 
               className="h-12 w-auto group-hover:scale-105 transition-transform brightness-150 contrast-125 saturate-110"
             />
