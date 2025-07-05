@@ -76,6 +76,11 @@ function App() {
   }, [loadTrendingMovies, isLoggedIn]);
 
   useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
     const timeoutId = setTimeout(() => {
       handleSearch(searchQuery);
     }, 300);
