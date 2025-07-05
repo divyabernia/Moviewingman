@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, TrendingUp, Heart, Brain, Zap, RefreshCw, X } from 'lucide-react';
+import { Sparkles, TrendingUp, Heart, Brain, Zap, RefreshCw, X, AlertTriangle } from 'lucide-react';
 import { aiSommelier, MovieRecommendation } from '../services/openai';
 import { Movie } from '../types/movie';
 import { searchMovies } from '../services/omdb';
@@ -21,6 +21,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({
   const [loading, setLoading] = useState(true);
   const [selectedMood, setSelectedMood] = useState<string>('general');
   const [recommendedMovies, setRecommendedMovies] = useState<Movie[]>([]);
+  const [showApiWarning, setShowApiWarning] = useState(true);
 
   const moods = [
     { id: 'general', label: 'Surprise Me', icon: Sparkles, color: 'purple' },
@@ -72,6 +73,26 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="bg-gradient-to-br from-purple-950/90 to-pink-950/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-2xl border border-purple-800/30">
             
+            {/* API Warning Banner */}
+            {showApiWarning && (
+              <div className="bg-gradient-to-r from-orange-600/20 to-red-600/20 border-b border-orange-500/30 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className="w-5 h-5 text-orange-400" />
+                    <span className="text-orange-200 text-sm">
+                      Demo Mode: Advanced AI recommendations available with OpenAI API configuration
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setShowApiWarning(false)}
+                    className="text-orange-300 hover:text-orange-100 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-8">
               <div className="flex items-center justify-between">
@@ -81,7 +102,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({
                   </div>
                   <div>
                     <h1 className="text-3xl font-black text-white">Smart Recommendations</h1>
-                    <p className="text-purple-100">AI-powered suggestions based on your taste</p>
+                    <p className="text-purple-100">AI-powered suggestions based on your taste (Demo Mode)</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -142,7 +163,7 @@ export const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({
                   <div>
                     <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                       <Brain className="w-6 h-6 text-purple-400" />
-                      AI Recommendations
+                      AI Recommendations (Demo)
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {recommendations.map((rec, index) => (

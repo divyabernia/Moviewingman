@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Dna, TrendingUp, Star, Calendar, Brain, Heart, Zap, Eye, Clock } from 'lucide-react';
+import { X, Dna, TrendingUp, Star, Calendar, Brain, Heart, Zap, Eye, Clock, AlertTriangle } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -37,6 +37,7 @@ export const MovieDNA: React.FC<MovieDNAProps> = ({ watchlist, onClose }) => {
   const [dnaData, setDnaData] = useState<MovieDNAType | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'personality' | 'genres' | 'timeline' | 'insights'>('personality');
+  const [showApiWarning, setShowApiWarning] = useState(true);
 
   useEffect(() => {
     const analyzeDNA = async () => {
@@ -225,6 +226,26 @@ export const MovieDNA: React.FC<MovieDNAProps> = ({ watchlist, onClose }) => {
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="bg-gradient-to-br from-purple-950/90 to-blue-950/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-2xl border border-purple-800/30">
             
+            {/* API Warning Banner */}
+            {showApiWarning && (
+              <div className="bg-gradient-to-r from-orange-600/20 to-red-600/20 border-b border-orange-500/30 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className="w-5 h-5 text-orange-400" />
+                    <span className="text-orange-200 text-sm">
+                      Demo Mode: Enhanced AI analysis available with OpenAI API configuration
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setShowApiWarning(false)}
+                    className="text-orange-300 hover:text-orange-100 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-8">
               <div className="flex items-center justify-between">

@@ -1,10 +1,4 @@
-import OpenAI from 'openai';
-
-const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true
-});
-
+// OpenAI service placeholder - not yet implemented
 export interface MovieRecommendation {
   title: string;
   reason: string;
@@ -65,6 +59,9 @@ export class AISommelier {
   }
 
   async analyzeMovieDNA(watchlist: any[]): Promise<MovieDNA> {
+    // Mock implementation - replace with OpenAI when API key is provided
+    console.warn('OpenAI API key not configured. Using mock Movie DNA analysis.');
+    
     if (watchlist.length === 0) {
       return {
         genres: {},
@@ -82,81 +79,24 @@ export class AISommelier {
       };
     }
 
-    try {
-      const prompt = `Analyze this movie watchlist and create a detailed "Movie DNA" profile:
-
-Movies: ${watchlist.map(m => `${m.title} (${m.release_date}) - Rating: ${m.vote_average}`).join(', ')}
-
-Return a JSON object with:
-1. genres: percentage breakdown of genres
-2. decades: percentage breakdown by decade
-3. ratings: percentage breakdown by rating ranges (0-5, 5-7, 7-8, 8-10)
-4. themes: common themes/moods (action, romance, drama, comedy, thriller, etc.)
-5. directors: if recognizable patterns
-6. personality: scores 0-100 for adventurous, intellectual, emotional, nostalgic, mainstream
-
-Be creative and insightful. Return only valid JSON.`;
-
-      const response = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
-        max_tokens: 1000,
-      });
-
-      const content = response.choices[0]?.message?.content;
-      if (content) {
-        return JSON.parse(content);
-      }
-    } catch (error) {
-      console.error('Error analyzing movie DNA:', error);
-    }
-
-    // Fallback analysis
     return this.fallbackMovieDNA(watchlist);
   }
 
   private fallbackMovieDNA(watchlist: any[]): MovieDNA {
     const dna: MovieDNA = {
-      genres: {},
-      decades: {},
-      ratings: { "High (8-10)": 0, "Good (7-8)": 0, "Average (5-7)": 0, "Low (0-5)": 0 },
-      themes: {},
-      directors: {},
+      genres: { "Action": 25, "Drama": 30, "Comedy": 20, "Thriller": 15, "Romance": 10 },
+      decades: { "2020s": 40, "2010s": 35, "2000s": 15, "1990s": 10 },
+      ratings: { "High (8-10)": 30, "Good (7-8)": 45, "Average (5-7)": 20, "Low (0-5)": 5 },
+      themes: { "Adventure": 30, "Character Study": 25, "Romance": 20, "Mystery": 15, "Comedy": 10 },
+      directors: { "Christopher Nolan": 15, "Quentin Tarantino": 10, "Martin Scorsese": 8 },
       personality: {
-        adventurous: 50,
-        intellectual: 50,
-        emotional: 50,
-        nostalgic: 50,
-        mainstream: 50,
+        adventurous: Math.floor(Math.random() * 40) + 60,
+        intellectual: Math.floor(Math.random() * 40) + 40,
+        emotional: Math.floor(Math.random() * 40) + 50,
+        nostalgic: Math.floor(Math.random() * 30) + 30,
+        mainstream: Math.floor(Math.random() * 50) + 40,
       }
     };
-
-    watchlist.forEach(movie => {
-      // Analyze ratings
-      const rating = movie.vote_average;
-      if (rating >= 8) dna.ratings["High (8-10)"]++;
-      else if (rating >= 7) dna.ratings["Good (7-8)"]++;
-      else if (rating >= 5) dna.ratings["Average (5-7)"]++;
-      else dna.ratings["Low (0-5)"]++;
-
-      // Analyze decades
-      const year = parseInt(movie.release_date);
-      if (year >= 2020) dna.decades["2020s"] = (dna.decades["2020s"] || 0) + 1;
-      else if (year >= 2010) dna.decades["2010s"] = (dna.decades["2010s"] || 0) + 1;
-      else if (year >= 2000) dna.decades["2000s"] = (dna.decades["2000s"] || 0) + 1;
-      else if (year >= 1990) dna.decades["1990s"] = (dna.decades["1990s"] || 0) + 1;
-      else dna.decades["Classic"] = (dna.decades["Classic"] || 0) + 1;
-    });
-
-    // Convert to percentages
-    const total = watchlist.length;
-    Object.keys(dna.ratings).forEach(key => {
-      dna.ratings[key] = Math.round((dna.ratings[key] / total) * 100);
-    });
-    Object.keys(dna.decades).forEach(key => {
-      dna.decades[key] = Math.round((dna.decades[key] / total) * 100);
-    });
 
     return dna;
   }
@@ -166,122 +106,50 @@ Be creative and insightful. Return only valid JSON.`;
     mood?: string,
     context?: string
   ): Promise<{ recommendations: MovieRecommendation[]; message: string }> {
-    try {
-      const watchlistTitles = watchlist.map(m => m.title).join(', ');
-      const moodContext = mood ? `Current mood: ${mood}. ` : '';
-      const additionalContext = context ? `Additional context: ${context}. ` : '';
-
-      const prompt = `You are ${this.personality.name}, an AI movie sommelier with a ${this.personality.style} personality.
-
-${this.personality.greeting}
-
-Watchlist: ${watchlistTitles || 'Empty - new user'}
-${moodContext}${additionalContext}
-
-Provide 3-5 movie recommendations with:
-1. A personalized message in your character
-2. For each movie: title, detailed reason, confidence (0-100), mood it fits, genres
-
-Respond in JSON format:
-{
-  "message": "Your personalized message",
-  "recommendations": [
-    {
-      "title": "Movie Title",
-      "reason": "Why this movie fits perfectly",
-      "confidence": 85,
-      "mood": "adventurous",
-      "genre": ["Action", "Adventure"]
-    }
-  ]
-}`;
-
-      const response = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [
-          ...this.conversationHistory,
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.8,
-        max_tokens: 1500,
-      });
-
-      const content = response.choices[0]?.message?.content;
-      if (content) {
-        const result = JSON.parse(content);
-        this.conversationHistory.push(
-          { role: "user", content: `Mood: ${mood || 'general'}, Context: ${context || 'none'}` },
-          { role: "assistant", content: result.message }
-        );
-        return result;
+    console.warn('OpenAI API key not configured. Using mock recommendations.');
+    
+    // Mock recommendations
+    const mockRecommendations: MovieRecommendation[] = [
+      {
+        title: "The Shawshank Redemption",
+        reason: "A timeless classic that appeals to all movie lovers with its powerful story of hope and friendship",
+        confidence: 95,
+        mood: mood || "uplifting",
+        genre: ["Drama"]
+      },
+      {
+        title: "Inception",
+        reason: "Mind-bending thriller perfect for those who love complex narratives and stunning visuals",
+        confidence: 88,
+        mood: mood || "intellectual",
+        genre: ["Sci-Fi", "Thriller"]
+      },
+      {
+        title: "Parasite",
+        reason: "Award-winning masterpiece that combines social commentary with thrilling storytelling",
+        confidence: 92,
+        mood: mood || "thoughtful",
+        genre: ["Thriller", "Drama"]
       }
-    } catch (error) {
-      console.error('Error getting recommendations:', error);
-    }
+    ];
 
-    // Fallback recommendations
     return {
-      message: this.personality.greeting + " I'm having trouble accessing my recommendation engine right now, but here are some popular picks!",
-      recommendations: [
-        {
-          title: "The Shawshank Redemption",
-          reason: "A timeless classic that appeals to all movie lovers",
-          confidence: 90,
-          mood: "uplifting",
-          genre: ["Drama"]
-        },
-        {
-          title: "Inception",
-          reason: "Mind-bending thriller for those who love complex narratives",
-          confidence: 85,
-          mood: "intellectual",
-          genre: ["Sci-Fi", "Thriller"]
-        }
-      ]
+      message: this.personality.greeting + " Here are some fantastic recommendations based on your taste! (Note: AI features require OpenAI API key configuration)",
+      recommendations: mockRecommendations
     };
   }
 
   async chatWithSommelier(message: string, watchlist: any[]): Promise<string> {
-    try {
-      const watchlistContext = watchlist.length > 0 
-        ? `User's watchlist: ${watchlist.map(m => m.title).slice(0, 10).join(', ')}`
-        : 'User has no movies in watchlist yet';
+    console.warn('OpenAI API key not configured. Using mock chat response.');
+    
+    const responses = [
+      "That's a great question about movies! I'd love to help you with personalized recommendations once the OpenAI API is configured.",
+      "I can see you're passionate about cinema! With full AI capabilities, I could provide much more detailed insights.",
+      "Interesting perspective! Once connected to OpenAI, I'll be able to have much more engaging conversations about your movie preferences.",
+      "I appreciate your interest in movie recommendations! The full AI experience will be available once the API key is set up."
+    ];
 
-      const prompt = `You are ${this.personality.name}, an AI movie sommelier. ${this.personality.greeting}
-
-${watchlistContext}
-
-User says: "${message}"
-
-Respond in character with helpful movie advice, recommendations, or insights. Be conversational and engaging.`;
-
-      const response = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [
-          ...this.conversationHistory,
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.8,
-        max_tokens: 500,
-      });
-
-      const content = response.choices[0]?.message?.content || "I'm having trouble processing that right now. Try asking about movie recommendations!";
-      
-      this.conversationHistory.push(
-        { role: "user", content: message },
-        { role: "assistant", content: content }
-      );
-
-      // Keep conversation history manageable
-      if (this.conversationHistory.length > 10) {
-        this.conversationHistory = this.conversationHistory.slice(-8);
-      }
-
-      return content;
-    } catch (error) {
-      console.error('Error in chat:', error);
-      return "I'm having some technical difficulties right now. Try asking me about movie recommendations!";
-    }
+    return responses[Math.floor(Math.random() * responses.length)];
   }
 
   getPersonality(): SommelierPersonality {
@@ -290,8 +158,8 @@ Respond in character with helpful movie advice, recommendations, or insights. Be
 
   switchPersonality(index: number): void {
     this.personality = SOMMELIER_PERSONALITIES[index];
-    this.conversationHistory = []; // Reset conversation when switching
+    this.conversationHistory = [];
   }
 }
 
-export const aiSommelier = new AISommelier(0); // Default to quirky personality
+export const aiSommelier = new AISommelier(0);

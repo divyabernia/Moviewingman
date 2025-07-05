@@ -12,7 +12,8 @@ import {
   Loader2,
   Settings,
   Mic,
-  Volume2
+  Volume2,
+  AlertTriangle
 } from 'lucide-react';
 import { aiSommelier, SOMMELIER_PERSONALITIES, MovieRecommendation } from '../services/openai';
 import { Movie } from '../types/movie';
@@ -36,16 +37,17 @@ export const AISommelier: React.FC<AISommelierProps> = ({
   const [showSettings, setShowSettings] = useState(false);
   const [currentPersonality, setCurrentPersonality] = useState(0);
   const [recommendations, setRecommendations] = useState<MovieRecommendation[]>([]);
+  const [showApiWarning, setShowApiWarning] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const personality = SOMMELIER_PERSONALITIES[currentPersonality];
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      // Initial greeting
+      // Initial greeting with API warning
       setMessages([{
         role: 'assistant',
-        content: personality.greeting + " I'm here to help you discover your next favorite movie! What kind of mood are you in today?",
+        content: personality.greeting + " I'm here to help you discover your next favorite movie! Note: Full AI capabilities require OpenAI API configuration.",
         timestamp: new Date()
       }]);
     }
@@ -96,7 +98,7 @@ export const AISommelier: React.FC<AISommelierProps> = ({
       console.error('Error sending message:', error);
       const errorMessage = {
         role: 'assistant' as const,
-        content: "I'm having some technical difficulties right now. Please try again in a moment!",
+        content: "I'm having some technical difficulties right now. This might be due to API configuration. Please try again in a moment!",
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
@@ -168,6 +170,26 @@ export const AISommelier: React.FC<AISommelierProps> = ({
         <div className="fixed inset-0 bg-black/90 backdrop-blur-xl z-50 flex items-center justify-center p-4">
           <div className="w-full max-w-4xl h-[90vh] bg-gradient-to-br from-purple-950/90 to-pink-950/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-2xl border border-purple-800/30">
             
+            {/* API Warning Banner */}
+            {showApiWarning && (
+              <div className="bg-gradient-to-r from-orange-600/20 to-red-600/20 border-b border-orange-500/30 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className="w-5 h-5 text-orange-400" />
+                    <span className="text-orange-200 text-sm">
+                      Demo Mode: Full AI features require OpenAI API configuration
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setShowApiWarning(false)}
+                    className="text-orange-300 hover:text-orange-100 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -176,7 +198,7 @@ export const AISommelier: React.FC<AISommelierProps> = ({
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-white">{personality.name}</h2>
-                  <p className="text-purple-100 text-sm">Your AI Movie Sommelier</p>
+                  <p className="text-purple-100 text-sm">Your AI Movie Sommelier (Demo Mode)</p>
                 </div>
               </div>
               
