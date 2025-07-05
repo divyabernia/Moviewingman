@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Info, Star, Calendar, Search, Sparkles, Brain, Zap } from 'lucide-react';
+import { Play, Info, Star, Calendar, Search } from 'lucide-react';
 import { VoiceSearchButton } from './VoiceSearchButton';
 import { MovieGrid } from './MovieGrid';
 import { Movie } from '../types/movie';
@@ -31,7 +31,7 @@ export const Hero: React.FC<HeroProps> = ({
   error,
   onQueryChange,
   onToggleWatchlist,
-  showSearchResults,
+  showSearchResults
   onShowAISommelier,
   onShowMovieDNA,
   onShowSmartRecommendations,
