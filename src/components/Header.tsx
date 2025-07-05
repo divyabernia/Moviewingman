@@ -32,6 +32,9 @@ export const Header: React.FC<HeaderProps> = ({
               alt="CineVault Logo" 
               className="h-12 w-auto group-hover:scale-105 transition-transform brightness-150 contrast-125 saturate-110"
             />
+            <span className="text-xl font-black bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent">
+              CineVault
+            </span>
           </div>
 
           {/* Navigation */}
