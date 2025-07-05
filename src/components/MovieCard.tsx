@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, Plus, Check, Trash2, Calendar, Eye, Heart, Users } from 'lucide-react';
+import { Star, Plus, Trash2, Calendar, Eye, Users } from 'lucide-react';
 import { Movie } from '../types/movie';
 import { getImageUrl, getYear } from '../services/omdb';
 
@@ -83,16 +83,19 @@ export const MovieCard: React.FC<MovieCardProps> = React.memo(({
 
           {/* Action Buttons */}
           <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex flex-col gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+            {/* View Details Button */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onMovieClick(movie.id);
               }}
               className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-black/80 backdrop-blur-sm text-white rounded-lg sm:rounded-xl flex items-center justify-center hover:bg-red-600/80 transition-all duration-200 transform hover:scale-110 border border-red-800/30"
+              title="View details"
             >
               <Eye className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
             </button>
             
+            {/* Social Add Button */}
             {onSocialAdd && (
               <button
                 onClick={(e) => {
@@ -100,11 +103,13 @@ export const MovieCard: React.FC<MovieCardProps> = React.memo(({
                   onSocialAdd(movie);
                 }}
                 className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-lg sm:rounded-xl flex items-center justify-center hover:from-purple-700 hover:to-purple-600 transition-all duration-200 transform hover:scale-110 border border-purple-500/50"
+                title="Add to social watchlist"
               >
                 <Users className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
               </button>
             )}
             
+            {/* Watchlist Toggle Button - Only show + or delete icon */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -112,18 +117,13 @@ export const MovieCard: React.FC<MovieCardProps> = React.memo(({
               }}
               className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-110 border ${
                 isInWatchlist
-                  ? showRemoveButton
-                    ? 'bg-red-600/90 text-white hover:bg-red-700/90 border-red-500/50'
-                    : 'bg-green-600/90 text-white hover:bg-green-700/90 border-green-500/50'
-                  : 'bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-700 hover:to-red-600 border-red-500/50'
+                  ? 'bg-red-600/90 text-white hover:bg-red-700/90 border-red-500/50'
+                  : 'bg-gradient-to-r from-green-600 to-green-500 text-white hover:from-green-700 hover:to-green-600 border-green-500/50'
               }`}
+              title={isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
             >
               {isInWatchlist ? (
-                showRemoveButton ? (
-                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                ) : (
-                  <Check className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
-                )
+                <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
               ) : (
                 <Plus className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
               )}
