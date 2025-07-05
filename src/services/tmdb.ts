@@ -92,7 +92,7 @@ export const getTrendingMoviesTMDb = async (): Promise<any[]> => {
   }
 };
 
-export const searchMoviesTMDb = async (query: string): Promise<any[]> => {
+export const searchMoviesTMDb = async (query: string, signal?: AbortSignal): Promise<any[]> => {
   if (!query.trim()) return [];
   
   try {
@@ -103,6 +103,7 @@ export const searchMoviesTMDb = async (query: string): Promise<any[]> => {
         page: 1,
         include_adult: false,
       },
+      signal,
     });
     
     console.log('TMDb search response:', response.data);

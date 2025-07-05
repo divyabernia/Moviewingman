@@ -23,6 +23,21 @@ export const MovieGrid: React.FC<MovieGridProps> = ({
   const isInWatchlist = (movie: Movie) => 
     watchlist.some(w => w.id === movie.id);
 
+  // Memoize the grid to prevent unnecessary re-renders
+  const movieCards = React.useMemo(() => {
+    return movies.map((movie) => (
+      <MovieCard
+        key={movie.id}
+        movie={movie}
+        isInWatchlist={isInWatchlist(movie)}
+        onToggleWatchlist={onToggleWatchlist}
+        onMovieClick={onMovieClick}
+        showRemoveButton={showRemoveButton}
+        onSocialAdd={onSocialAdd}
+      />
+    ));
+  }, [movies, watchlist, onToggleWatchlist, onMovieClick, showRemoveButton, onSocialAdd]);
+
   if (movies.length === 0) {
     return (
       <div className="text-center py-12 sm:py-16 md:py-20">
@@ -48,17 +63,7 @@ export const MovieGrid: React.FC<MovieGridProps> = ({
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
-      {movies.map((movie) => (
-        <MovieCard
-          key={movie.id}
-          movie={movie}
-          isInWatchlist={isInWatchlist(movie)}
-          onToggleWatchlist={onToggleWatchlist}
-          onMovieClick={onMovieClick}
-          showRemoveButton={showRemoveButton}
-          onSocialAdd={onSocialAdd}
-        />
-      ))}
+      {movieCards}
     </div>
   );
 };

@@ -12,7 +12,7 @@ interface MovieCardProps {
   onSocialAdd?: (movie: Movie) => void;
 }
 
-export const MovieCard: React.FC<MovieCardProps> = ({
+export const MovieCard: React.FC<MovieCardProps> = React.memo(({
   movie,
   isInWatchlist,
   onToggleWatchlist,
@@ -164,4 +164,6 @@ export const MovieCard: React.FC<MovieCardProps> = ({
       </div>
     </div>
   );
-};
+});
+
+MovieCard.displayName = 'MovieCard';

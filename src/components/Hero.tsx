@@ -47,6 +47,20 @@ export const Hero: React.FC<HeroProps> = ({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [stableResults, setStableResults] = useState<Movie[]>([]);
+  const [lastSuccessfulQuery, setLastSuccessfulQuery] = useState<string>('');
+
+  // Stabilize search results to prevent flickering
+  useEffect(() => {
+    if (!loading && searchResults.length > 0 && searchQuery.trim()) {
+      setStableResults(searchResults);
+      setLastSuccessfulQuery(searchQuery);
+    }
+  }, [searchResults, loading, searchQuery]);
+
+  // Use stable results when loading to prevent flickering
+  const displayResults = loading && stableResults.length > 0 && 
+    searchQuery.includes(lastSuccessfulQuery) ? stableResults : searchResults;
 
   // Popular search suggestions
   const popularSuggestions = [
@@ -445,15 +459,15 @@ export const Hero: React.FC<HeroProps> = ({
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-gray-300">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 bg-green-600/20 border border-green-500/30 rounded-full flex items-center justify-center">
-                      <span className="text-green-400 font-bold text-sm">{searchResults.length}</span>
+                      <span className="text-green-400 font-bold text-sm">{displayResults.length}</span>
                     </div>
                     <span>movies found</span>
                   </div>
-                  {searchResults.length > 0 && (
+                  {displayResults.length > 0 && (
                     <div className="flex items-center gap-2 text-sm">
                       <Star className="w-4 h-4 text-yellow-400" />
                       <span>
-                        Avg rating: {(searchResults.reduce((sum, m) => sum + m.vote_average, 0) / searchResults.length).toFixed(1)}
+                        Avg rating: {(displayResults.reduce((sum, m) => sum + m.vote_average, 0) / displayResults.length).toFixed(1)}
                       </span>
                     </div>
                   )}
@@ -471,11 +485,11 @@ export const Hero: React.FC<HeroProps> = ({
                   <X className="w-4 h-4" />
                   Clear Search
                 </button>
-                {searchResults.length > 0 && (
+                {displayResults.length > 0 && (
                   <button
                     onClick={() => {
                       // Add all results to watchlist
-                      searchResults.forEach(movie => {
+                      displayResults.forEach(movie => {
                         if (!watchlist.some(w => w.id === movie.id)) {
                           onToggleWatchlist(movie);
                         }
@@ -490,36 +504,36 @@ export const Hero: React.FC<HeroProps> = ({
               </div>
             </div>
             
-            {!loading && !error && searchResults.length > 0 && (
+            {!loading && !error && displayResults.length > 0 && (
               <div>
                 {/* Search Results Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                   <div className="bg-red-900/20 border border-red-800/30 rounded-xl p-4 text-center">
-                    <div className="text-2xl font-bold text-white">{searchResults.length}</div>
+                    <div className="text-2xl font-bold text-white">{displayResults.length}</div>
                     <div className="text-red-300 text-sm">Total Results</div>
                   </div>
                   <div className="bg-yellow-900/20 border border-yellow-800/30 rounded-xl p-4 text-center">
                     <div className="text-2xl font-bold text-white">
-                      {searchResults.filter(m => m.vote_average >= 8).length}
+                      {displayResults.filter(m => m.vote_average >= 8).length}
                     </div>
                     <div className="text-yellow-300 text-sm">Highly Rated</div>
                   </div>
                   <div className="bg-green-900/20 border border-green-800/30 rounded-xl p-4 text-center">
                     <div className="text-2xl font-bold text-white">
-                      {searchResults.filter(m => new Date(m.release_date).getFullYear() >= 2020).length}
+                      {displayResults.filter(m => new Date(m.release_date).getFullYear() >= 2020).length}
                     </div>
                     <div className="text-green-300 text-sm">Recent (2020+)</div>
                   </div>
                   <div className="bg-blue-900/20 border border-blue-800/30 rounded-xl p-4 text-center">
                     <div className="text-2xl font-bold text-white">
-                      {searchResults.filter(m => watchlist.some(w => w.id === m.id)).length}
+                      {displayResults.filter(m => watchlist.some(w => w.id === m.id)).length}
                     </div>
                     <div className="text-blue-300 text-sm">In Watchlist</div>
                   </div>
                 </div>
                 
                 <MovieGrid
-                  movies={searchResults}
+                  movies={displayResults}
                   watchlist={watchlist}
                   onToggleWatchlist={onToggleWatchlist}
                   onMovieClick={onMovieClick}
@@ -528,7 +542,7 @@ export const Hero: React.FC<HeroProps> = ({
               </div>
             )}
             
-            {!loading && !error && searchResults.length === 0 && searchQuery.trim() && (
+            {!loading && !error && displayResults.length === 0 && searchQuery.trim() && (
               <div className="text-center py-12">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-r from-red-600/20 to-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-6 border border-red-800/30">
                   <Search className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-red-400" />

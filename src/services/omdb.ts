@@ -80,12 +80,12 @@ export const convertOMDbToMovie = (omdbMovie: OMDbMovie | OMDbSearchResult, inde
   };
 };
 
-export const searchMovies = async (query: string): Promise<any[]> => {
+export const searchMovies = async (query: string, signal?: AbortSignal): Promise<any[]> => {
   if (!query.trim()) return [];
   
   try {
     console.log('Searching TMDb for:', query);
-    const tmdbResults = await searchMoviesTMDb(query);
+    const tmdbResults = await searchMoviesTMDb(query, signal);
     if (tmdbResults.length > 0) {
       console.log('Found results from TMDb');
       return tmdbResults;
@@ -103,6 +103,7 @@ export const searchMovies = async (query: string): Promise<any[]> => {
         type: 'movie',
         page: 1,
       },
+      signal,
     });
     
     console.log('OMDb Search Response:', response.data);

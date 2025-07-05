@@ -12,6 +12,8 @@ import { MovieDNA } from './components/MovieDNA';
 import { SmartRecommendations } from './components/SmartRecommendations';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useSocialWatchlist } from './hooks/useSocialWatchlist';
+import { useDebounce } from './hooks/useDebounce';
+import { useSearchCache } from './hooks/useSearchCache';
 import { SocialWatchlistModal } from './components/SocialWatchlistModal';
 import { SocialWatchlistView } from './components/SocialWatchlistView';
 import { searchMovies, getTrendingMovies, getMovieDetails, getPersonDetails } from './services/omdb';
@@ -34,6 +36,14 @@ function App() {
   const [showSmartRecommendations, setShowSmartRecommendations] = useState(false);
   const [showSocialModal, setShowSocialModal] = useState(false);
   const [selectedMovieForSocial, setSelectedMovieForSocial] = useState<Movie | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchAbortController, setSearchAbortController] = useState<AbortController | null>(null);
+
+  // Debounce search query to prevent excessive API calls
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  
+  // Search cache to store recent results
+  const { getCachedResults, setCachedResults } = useSearchCache();
 
   // Social watchlist hook
   const {
@@ -48,22 +58,52 @@ function App() {
   const handleSearch = useCallback(async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
+      setIsSearching(false);
       return;
     }
 
-    setLoading(true);
+    // Cancel previous search if still running
+    if (searchAbortController) {
+      searchAbortController.abort();
+    }
+
+    // Check cache first
+    const cachedResults = getCachedResults(query);
+    if (cachedResults) {
+      setSearchResults(cachedResults);
+      setError(null);
+      setIsSearching(false);
+      return;
+    }
+
+    // Create new abort controller for this search
+    const abortController = new AbortController();
+    setSearchAbortController(abortController);
+    
+    setIsSearching(true);
     setError(null);
 
     try {
-      const results = await searchMovies(query);
+      const results = await searchMovies(query, abortController.signal);
       setSearchResults(results);
+      setCachedResults(query, results);
     } catch (err) {
-      setError('Failed to search movies. Please try again.');
-      setSearchResults([]);
+      if (err.name !== 'AbortError') {
+        setError('Failed to search movies. Please try again.');
+        setSearchResults([]);
+      }
     } finally {
-      setLoading(false);
+      setIsSearching(false);
+      setSearchAbortController(null);
     }
-  }, []);
+  }, [searchAbortController, getCachedResults, setCachedResults]);
+
+  // Effect for debounced search
+  useEffect(() => {
+    if (debouncedSearchQuery.trim() && showSearchResults) {
+      handleSearch(debouncedSearchQuery);
+    }
+  }, [debouncedSearchQuery, showSearchResults, handleSearch]);
 
   const loadTrendingMovies = useCallback(async () => {
     if (loading) return; // Prevent multiple simultaneous calls
@@ -91,8 +131,8 @@ function App() {
         if (query && query.trim()) {
           setSearchQuery(query);
           setCurrentView('search');
-          // Trigger search immediately
-          handleSearch(query);
+          setShowSearchResults(true);
+          // Search will be triggered by the debounced effect
         }
       };
       
@@ -145,12 +185,7 @@ function App() {
       setShowSearchResults(false);
     } else {
       setShowSearchResults(true);
-      // Dynamic search with debouncing
-      const timeoutId = setTimeout(() => {
-        handleSearch(query);
-      }, 300);
-      
-      return () => clearTimeout(timeoutId);
+      // Don't clear timeout here as it's handled by useDebounce
     }
   };
 
@@ -277,7 +312,7 @@ function App() {
               searchQuery={searchQuery}
               searchResults={searchResults}
               watchlist={watchlist}
-              loading={loading}
+              loading={isSearching}
               error={error}
               onQueryChange={handleQueryChange}
               onToggleWatchlist={handleToggleWatchlist}
@@ -304,7 +339,7 @@ function App() {
               searchQuery={searchQuery}
               searchResults={searchResults}
               watchlist={watchlist}
-              loading={loading}
+              loading={isSearching}
               error={error}
               onQueryChange={handleQueryChange}
               onManualSearch={handleManualSearch}

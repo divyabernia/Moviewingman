@@ -35,6 +35,20 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
   const [showFilters, setShowFilters] = useState(false);
   const [searchSuggestions, setSearchSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [stableResults, setStableResults] = useState<Movie[]>([]);
+  const [lastSuccessfulQuery, setLastSuccessfulQuery] = useState<string>('');
+
+  // Stabilize search results to prevent flickering
+  useEffect(() => {
+    if (!loading && searchResults.length > 0 && searchQuery.trim()) {
+      setStableResults(searchResults);
+      setLastSuccessfulQuery(searchQuery);
+    }
+  }, [searchResults, loading, searchQuery]);
+
+  // Use stable results when loading to prevent flickering
+  const displayResults = loading && stableResults.length > 0 && 
+    searchQuery.includes(lastSuccessfulQuery) ? stableResults : searchResults;
 
   // Popular search suggestions
   const popularSuggestions = [
@@ -59,7 +73,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
 
   // Filter and sort movies
   const processedResults = React.useMemo(() => {
-    let filtered = [...searchResults];
+    let filtered = [...displayResults];
 
     // Apply filters
     switch (filterBy) {
@@ -92,7 +106,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
     }
 
     return filtered;
-  }, [searchResults, sortBy, filterBy, sortOrder]);
+  }, [displayResults, sortBy, filterBy, sortOrder]);
   const handleVoiceTranscription = (transcription: string) => {
     if (transcription.trim()) {
       onQueryChange(transcription);
@@ -249,9 +263,10 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
                 </span>
               ) : (
                 `Found ${processedResults.length} of ${searchResults.length} results for "${searchQuery}"`
+                `Found ${processedResults.length} of ${displayResults.length} results for "${searchQuery}"`
               )}
               </p>
-              {!loading && processedResults.length !== searchResults.length && (
+              {!loading && processedResults.length !== displayResults.length && (
                 <span className="text-xs text-red-400 bg-red-900/30 px-2 py-1 rounded-full">
                   Filtered
                 </span>
