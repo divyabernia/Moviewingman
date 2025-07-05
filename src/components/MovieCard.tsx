@@ -44,10 +44,6 @@ export const MovieCard: React.FC<MovieCardProps> = React.memo(({
     setImageLoaded(true);
   };
 
-  const handleImageLoad = () => {
-    setImageLoaded(true);
-  };
-
   return (
     <div className="group relative">
       <div className="bg-black/50 backdrop-blur-sm rounded-lg sm:rounded-xl overflow-hidden border border-red-800/30 hover:border-red-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-red-500/10 transform hover:scale-105">
@@ -81,41 +77,41 @@ export const MovieCard: React.FC<MovieCardProps> = React.memo(({
             </span>
           </div>
 
-          {/* Action Buttons */}
-          <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex flex-col gap-1 sm:gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+          {/* Action Buttons - ALWAYS VISIBLE */}
+          <div className="absolute top-2 sm:top-4 right-2 sm:right-4 flex flex-col gap-1 sm:gap-2">
             {/* View Details Button */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onMovieClick(movie.id);
               }}
-              className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-black/80 backdrop-blur-sm text-white rounded-lg sm:rounded-xl flex items-center justify-center hover:bg-red-600/80 transition-all duration-200 transform hover:scale-110 border border-red-800/30"
+              className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-black/80 backdrop-blur-sm text-white rounded-lg sm:rounded-xl flex items-center justify-center hover:bg-red-600/80 transition-all duration-200 transform hover:scale-110 border border-red-800/30 shadow-lg"
               title="View details"
             >
               <Eye className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
             </button>
             
-            {/* Social Add Button */}
+            {/* Social Add Button - ALWAYS VISIBLE when onSocialAdd is provided */}
             {onSocialAdd && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   onSocialAdd(movie);
                 }}
-                className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-lg sm:rounded-xl flex items-center justify-center hover:from-purple-700 hover:to-purple-600 transition-all duration-200 transform hover:scale-110 border border-purple-500/50"
+                className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-lg sm:rounded-xl flex items-center justify-center hover:from-purple-700 hover:to-purple-600 transition-all duration-200 transform hover:scale-110 border border-purple-500/50 shadow-lg"
                 title="Add to social watchlist"
               >
                 <Users className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
               </button>
             )}
             
-            {/* Watchlist Toggle Button - Only show + or delete icon */}
+            {/* Watchlist Toggle Button - ALWAYS VISIBLE */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleWatchlist(movie);
               }}
-              className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-110 border ${
+              className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-110 border shadow-lg ${
                 isInWatchlist
                   ? 'bg-red-600/90 text-white hover:bg-red-700/90 border-red-500/50'
                   : 'bg-gradient-to-r from-green-600 to-green-500 text-white hover:from-green-700 hover:to-green-600 border-green-500/50'
