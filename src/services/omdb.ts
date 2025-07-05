@@ -138,44 +138,11 @@ export const searchMovies = async (query: string): Promise<any[]> => {
 };
 
 export const getTrendingMovies = async (): Promise<any[]> => {
-  // Use OMDb popular movies
-  const popularMovies = [
-    'Avengers', 'Spider-Man', 'Batman', 'Superman', 'Iron Man',
-    'Wonder Woman', 'Black Panther', 'Captain America', 'Thor',
-    'Matrix', 'Inception', 'Interstellar', 'Godfather', 'Titanic'
-  ];
-  
   try {
-    console.log('Fetching popular movies from OMDb...');
-    const moviePromises = popularMovies.slice(0, 10).map(async (title, index) => {
-      try {
-        const response = await omdbApi.get('', {
-          params: {
-            s: title, // Use 's' for search
-            type: 'movie',
-            page: 1,
-          },
-        });
-        
-        if (response.data.Response === 'True' && response.data.Search && response.data.Search.length > 0) {
-          return convertOMDbToMovie(response.data.Search[0], index);
-        }
-        return null;
-      } catch (error) {
-        console.warn(`Failed to fetch ${title}:`, error);
-        return null;
-      }
-    });
-    
-    const results = await Promise.all(moviePromises);
-    const validResults = results.filter(movie => movie !== null);
-    
-    console.log('Popular movies fetched from OMDb:', validResults.length);
-    
-    if (validResults.length === 0) {
-      throw new Error('No trending movies found');
-    }
-    return validResults;
+    console.log('Fetching trending movies from IMDb...');
+    const trendingMovies = await getTrendingMoviesIMDb();
+    console.log('Trending movies fetched from IMDb:', trendingMovies.length);
+    return trendingMovies;
   } catch (error) {
     console.error('Error fetching trending movies:', error);
     throw new Error('Failed to fetch trending movies. Please check your internet connection.');
