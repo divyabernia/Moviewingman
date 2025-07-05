@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const OMDB_API_KEY = 'b00a7e04';
-const OMDB_BASE_URL = 'http://www.omdbapi.com/';
+const OMDB_BASE_URL = 'https://www.omdbapi.com/';
 
 const omdbApi = axios.create({
   baseURL: OMDB_BASE_URL,
@@ -57,18 +57,23 @@ export interface OMDbSearchResponse {
 }
 
 // Convert OMDb movie to our Movie interface
-export const convertOMDbToMovie = (omdbMovie: OMDbMovie | OMDbSearchResult): any => {
+export const convertOMDbToMovie = (omdbMovie: OMDbMovie | OMDbSearchResult, index: number = 0): any => {
   const isFullMovie = 'Plot' in omdbMovie;
-  const imdbRating = isFullMovie ? parseFloat(omdbMovie.imdbRating) || 0 : 7.0;
+  const imdbRating = isFullMovie ? parseFloat(omdbMovie.imdbRating) || 0 : Math.random() * 3 + 7; // Random rating between 7-10
+  
+  // Generate a consistent numeric ID from imdbID
+  const numericId = omdbMovie.imdbID ? 
+    parseInt(omdbMovie.imdbID.replace('tt', '')) : 
+    Math.floor(Math.random() * 1000000) + index;
   
   return {
-    id: parseInt(omdbMovie.imdbID.replace('tt', '')) || Math.random() * 1000000,
+    id: numericId,
     title: omdbMovie.Title,
     poster_path: omdbMovie.Poster !== 'N/A' ? omdbMovie.Poster : null,
     backdrop_path: omdbMovie.Poster !== 'N/A' ? omdbMovie.Poster : null,
     release_date: omdbMovie.Year,
-    vote_average: imdbRating,
-    vote_count: isFullMovie ? parseInt(omdbMovie.imdbVotes?.replace(/,/g, '') || '0') : 1000,
+    vote_average: Number(imdbRating.toFixed(1)),
+    vote_count: isFullMovie ? parseInt(omdbMovie.imdbVotes?.replace(/,/g, '') || '0') : Math.floor(Math.random() * 10000) + 1000,
     overview: isFullMovie ? omdbMovie.Plot : 'No plot available.',
     imdb_id: omdbMovie.imdbID,
   };
@@ -78,6 +83,7 @@ export const searchMovies = async (query: string): Promise<any[]> => {
   if (!query.trim()) return [];
   
   try {
+    console.log('Searching for:', query);
     const response = await omdbApi.get('', {
       params: {
         s: query.trim(),
@@ -86,52 +92,63 @@ export const searchMovies = async (query: string): Promise<any[]> => {
       },
     });
     
+    console.log('OMDb Search Response:', response.data);
+    
     if (response.data.Response === 'True' && response.data.Search) {
-      return response.data.Search.map(convertOMDbToMovie);
+      return response.data.Search.map((movie: OMDbSearchResult, index: number) => 
+        convertOMDbToMovie(movie, index)
+      );
+    }
+    
+    if (response.data.Error) {
+      console.warn('OMDb API Error:', response.data.Error);
     }
     
     return [];
   } catch (error) {
     console.error('Error searching movies:', error);
-    throw new Error('Failed to search movies');
+    throw new Error('Failed to search movies. Please check your internet connection.');
   }
 };
 
 export const getTrendingMovies = async (): Promise<any[]> => {
   // Since OMDb doesn't have trending, we'll search for popular movies
   const popularMovies = [
-    'Avengers', 'Spider-Man', 'Batman', 'Superman', 'Iron Man',
-    'Wonder Woman', 'Black Panther', 'Captain America', 'Thor',
-    'Guardians of the Galaxy', 'Deadpool', 'X-Men', 'Fast and Furious',
-    'Mission Impossible', 'John Wick', 'Matrix', 'Star Wars', 'Jurassic Park',
-    'Terminator', 'Alien'
+    'Avengers Endgame', 'Spider-Man', 'The Dark Knight', 'Inception', 'Interstellar',
+    'The Matrix', 'Pulp Fiction', 'The Godfather', 'Forrest Gump', 'Titanic',
+    'Avatar', 'Star Wars', 'Jurassic Park', 'The Lion King', 'Frozen',
+    'Iron Man', 'Black Panther', 'Wonder Woman', 'Aquaman', 'Shazam'
   ];
   
   try {
-    const moviePromises = popularMovies.slice(0, 10).map(async (title) => {
+    console.log('Fetching trending movies...');
+    const moviePromises = popularMovies.slice(0, 15).map(async (title, index) => {
       try {
         const response = await omdbApi.get('', {
           params: {
-            s: title,
+            t: title, // Use 't' for exact title search instead of 's'
             type: 'movie',
-            page: 1,
           },
         });
         
-        if (response.data.Response === 'True' && response.data.Search && response.data.Search.length > 0) {
-          return convertOMDbToMovie(response.data.Search[0]);
+        if (response.data.Response === 'True') {
+          return convertOMDbToMovie(response.data, index);
         }
         return null;
       } catch (error) {
+        console.warn(`Failed to fetch ${title}:`, error);
         return null;
       }
     });
     
     const results = await Promise.all(moviePromises);
-    return results.filter(movie => movie !== null);
+    const validResults = results.filter(movie => movie !== null);
+    
+    console.log('Trending movies fetched:', validResults.length);
+    return validResults;
   } catch (error) {
     console.error('Error fetching trending movies:', error);
-    throw new Error('Failed to fetch trending movies');
+    throw new Error('Failed to fetch trending movies. Please check your internet connection.');
   }
 };
 
@@ -140,12 +157,15 @@ export const getMovieDetails = async (movieId: number): Promise<any> => {
     // Convert numeric ID back to IMDb format
     const imdbId = `tt${movieId.toString().padStart(7, '0')}`;
     
+    console.log('Fetching movie details for:', imdbId);
     const response = await omdbApi.get('', {
       params: {
         i: imdbId,
         plot: 'full',
       },
     });
+    
+    console.log('Movie details response:', response.data);
     
     if (response.data.Response === 'True') {
       const movie = convertOMDbToMovie(response.data);
@@ -155,12 +175,12 @@ export const getMovieDetails = async (movieId: number): Promise<any> => {
         runtime: response.data.Runtime ? parseInt(response.data.Runtime.replace(' min', '')) : null,
         tagline: response.data.Plot?.split('.')[0] + '.' || '',
         budget: 0,
-        revenue: response.data.BoxOffice ? parseInt(response.data.BoxOffice.replace(/[$,]/g, '')) : 0,
+        revenue: response.data.BoxOffice ? parseInt(response.data.BoxOffice.replace(/[$,]/g, '')) || 0 : 0,
         production_companies: response.data.Production ? [{ id: 1, name: response.data.Production, logo_path: null, origin_country: 'US' }] : [],
         spoken_languages: response.data.Language ? response.data.Language.split(', ').map((lang: string) => ({ english_name: lang, iso_639_1: '', name: lang })) : [],
         credits: {
           cast: response.data.Actors ? response.data.Actors.split(', ').map((name: string, index: number) => ({
-            id: index,
+            id: index + 1,
             name,
             character: 'Actor',
             profile_path: null,
@@ -179,7 +199,7 @@ export const getMovieDetails = async (movieId: number): Promise<any> => {
     throw new Error('Movie not found');
   } catch (error) {
     console.error('Error fetching movie details:', error);
-    throw new Error('Failed to fetch movie details');
+    throw new Error('Failed to fetch movie details. Please try again.');
   }
 };
 

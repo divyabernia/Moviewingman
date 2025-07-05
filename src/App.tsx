@@ -45,10 +45,14 @@ function App() {
 
   const loadTrendingMovies = useCallback(async () => {
     try {
+      setLoading(true);
       const trending = await getTrendingMovies();
       setTrendingMovies(trending);
     } catch (err) {
       console.error('Failed to load trending movies:', err);
+      setError('Failed to load trending movies. Please try again.');
+    } finally {
+      setLoading(false);
     }
   }, []);
 
