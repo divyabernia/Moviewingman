@@ -26,14 +26,19 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4">
             <div className="relative h-12 sm:h-16 md:h-20 w-auto">
               {!logoLoaded && (
-                <div className="h-12 sm:h-16 md:h-20 w-12 sm:w-16 md:w-20 bg-gray-700 animate-pulse rounded" />
+                <div className="h-12 sm:h-16 md:h-20 w-12 sm:w-16 md:w-20 bg-gray-700 skeleton rounded" />
               )}
+              <img 
+                src="/WhatsApp Image 2025-07-05 at 16.59.28.jpeg" 
+                alt="CineVault Logo" 
+                className={`h-12 sm:h-16 md:h-20 w-auto brightness-150 contrast-125 saturate-110 transition-opacity duration-300 ${
+                  logoLoaded ? 'opacity-100' : 'opacity-0 absolute'
+                }`}
+                onLoad={() => setLogoLoaded(true)}
+                loading="eager"
+                style={{ display: logoLoaded ? 'block' : 'none' }}
+              />
             </div>
-            <img 
-              src="/WhatsApp Image 2025-07-05 at 16.59.28.jpeg" 
-              alt="CineVault Logo" 
-              className="h-12 sm:h-16 md:h-20 w-auto brightness-150 contrast-125 saturate-110"
-            />
             <span className="text-2xl sm:text-3xl md:text-4xl font-black bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent">
               CineVault
             </span>

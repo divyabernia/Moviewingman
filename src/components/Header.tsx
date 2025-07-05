@@ -22,6 +22,18 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [logoLoaded, setLogoLoaded] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string>('');
+
+  // Preload logo
+  React.useEffect(() => {
+    const url = "/WhatsApp Image 2025-07-05 at 16.59.28.jpeg";
+    setLogoUrl(url);
+    
+    const img = new Image();
+    img.onload = () => setLogoLoaded(true);
+    img.onerror = () => setLogoLoaded(true);
+    img.src = url;
+  }, []);
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-b border-red-800/30 z-50">
@@ -34,16 +46,16 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <div className="relative h-8 sm:h-10 md:h-12 w-auto">
               {!logoLoaded && (
-                <div className="h-8 sm:h-10 md:h-12 w-8 sm:w-10 md:w-12 bg-gray-700 animate-pulse rounded" />
+                <div className="h-8 sm:h-10 md:h-12 w-8 sm:w-10 md:w-12 bg-gray-700 skeleton rounded" />
               )}
             <img 
-              src="/WhatsApp Image 2025-07-05 at 16.59.28.jpeg" 
+              src={logoUrl}
               alt="CineVault Logo" 
-                className={`h-8 sm:h-10 md:h-12 w-auto group-hover:scale-105 transition-all brightness-150 contrast-125 saturate-110 ${
-                  logoLoaded ? 'opacity-100' : 'opacity-0'
+              className={`h-8 sm:h-10 md:h-12 w-auto group-hover:scale-105 transition-all duration-300 brightness-150 contrast-125 saturate-110 ${
+                logoLoaded ? 'opacity-100' : 'opacity-0 absolute'
                 }`}
-                onLoad={() => setLogoLoaded(true)}
-                loading="eager"
+              loading="eager"
+              style={{ display: logoLoaded ? 'block' : 'none' }}
             />
             </div>
             <span className="text-lg sm:text-xl font-black bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent hidden sm:block">

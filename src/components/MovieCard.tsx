@@ -22,6 +22,21 @@ export const MovieCard: React.FC<MovieCardProps> = ({
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string>('');
+
+  // Preload image when component mounts
+  React.useEffect(() => {
+    const url = getImageUrl(movie.poster_path);
+    setImageUrl(url);
+    
+    const img = new Image();
+    img.onload = () => setImageLoaded(true);
+    img.onerror = () => {
+      setImageError(true);
+      setImageLoaded(true);
+    };
+    img.src = url;
+  }, [movie.poster_path]);
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     e.currentTarget.src = 'https://via.placeholder.com/300x450/111111/666666?text=No+Image';
@@ -37,25 +52,24 @@ export const MovieCard: React.FC<MovieCardProps> = ({
     <div className="group relative">
       <div className="bg-black/50 backdrop-blur-sm rounded-lg sm:rounded-xl overflow-hidden border border-red-800/30 hover:border-red-500/50 transition-all duration-300 hover:shadow-2xl hover:shadow-red-500/10 transform hover:scale-105">
         <div className="relative overflow-hidden">
-          {/* Image placeholder to prevent layout shift */}
-          <div className="w-full h-64 sm:h-80 md:h-96 bg-gray-800 flex items-center justify-center">
-            {!imageLoaded && !imageError && (
-              <div className="animate-pulse bg-gray-700 w-full h-full flex items-center justify-center">
-                <div className="text-gray-500 text-sm">Loading...</div>
-              </div>
-            )}
+          {/* Skeleton loader */}
+          {!imageLoaded && (
+            <div className="w-full h-64 sm:h-80 md:h-96 bg-gradient-to-br from-gray-800 to-gray-700 skeleton flex items-center justify-center">
+              <div className="text-gray-500 text-xs sm:text-sm opacity-50">Loading...</div>
+            </div>
+          )}
+          
           <img
-            src={getImageUrl(movie.poster_path)}
+            src={imageUrl}
             alt={movie.title}
             onError={handleImageError}
-              onLoad={handleImageLoad}
-              className={`absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-all duration-500 cursor-pointer ${
-                imageLoaded ? 'opacity-100' : 'opacity-0'
+            className={`w-full h-64 sm:h-80 md:h-96 object-cover group-hover:scale-110 transition-all duration-500 cursor-pointer ${
+              imageLoaded ? 'opacity-100' : 'opacity-0 absolute inset-0'
               }`}
             onClick={() => onMovieClick(movie.id)}
-              loading="lazy"
+            loading="lazy"
+            style={{ display: imageLoaded ? 'block' : 'none' }}
           />
-          </div>
           
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           

@@ -21,6 +21,29 @@ export const MovieDetails: React.FC<MovieDetailsProps> = ({
 }) => {
   const [backdropLoaded, setBackdropLoaded] = useState(false);
   const [posterLoaded, setPosterLoaded] = useState(false);
+  const [backdropUrl, setBackdropUrl] = useState<string>('');
+  const [posterUrl, setPosterUrl] = useState<string>('');
+
+  // Preload images when component mounts
+  React.useEffect(() => {
+    const backdrop = getImageUrl(movie.backdrop_path);
+    const poster = getImageUrl(movie.poster_path);
+    
+    setBackdropUrl(backdrop);
+    setPosterUrl(poster);
+    
+    // Preload backdrop
+    const backdropImg = new Image();
+    backdropImg.onload = () => setBackdropLoaded(true);
+    backdropImg.onerror = () => setBackdropLoaded(true);
+    backdropImg.src = backdrop;
+    
+    // Preload poster
+    const posterImg = new Image();
+    posterImg.onload = () => setPosterLoaded(true);
+    posterImg.onerror = () => setPosterLoaded(true);
+    posterImg.src = poster;
+  }, [movie.backdrop_path, movie.poster_path]);
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     e.currentTarget.src = 'https://via.placeholder.com/300x450/111111/666666?text=No+Image';
@@ -53,17 +76,17 @@ export const MovieDetails: React.FC<MovieDetailsProps> = ({
             {/* Header with backdrop */}
             <div className="relative h-80 md:h-96">
               {!backdropLoaded && (
-                <div className="absolute inset-0 bg-gray-800 animate-pulse" />
+                <div className="absolute inset-0 bg-gray-800 skeleton" />
               )}
               <img
-                src={getImageUrl(movie.backdrop_path)}
+                src={backdropUrl}
                 alt={movie.title}
-                className={`w-full h-full object-cover transition-opacity duration-300 ${
-                  backdropLoaded ? 'opacity-100' : 'opacity-0'
+                className={`w-full h-full object-cover transition-opacity duration-500 ${
+                  backdropLoaded ? 'opacity-100' : 'opacity-0 absolute inset-0'
                 }`}
                 onError={handleImageError}
-                onLoad={() => setBackdropLoaded(true)}
                 loading="eager"
+                style={{ display: backdropLoaded ? 'block' : 'none' }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-red-950 via-red-950/70 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent" />
@@ -89,17 +112,17 @@ export const MovieDetails: React.FC<MovieDetailsProps> = ({
                 <div className="flex-shrink-0">
                   <div className="relative w-64 h-96">
                     {!posterLoaded && (
-                      <div className="absolute inset-0 bg-gray-700 animate-pulse rounded-xl" />
+                      <div className="absolute inset-0 bg-gray-700 skeleton rounded-xl" />
                     )}
                     <img
-                      src={getImageUrl(movie.poster_path)}
+                      src={posterUrl}
                       alt={movie.title}
                       onError={handleImageError}
-                      className={`w-64 h-96 object-cover rounded-xl shadow-2xl mx-auto lg:mx-0 border border-red-800/30 transition-opacity duration-300 ${
-                        posterLoaded ? 'opacity-100' : 'opacity-0'
+                      className={`w-64 h-96 object-cover rounded-xl shadow-2xl mx-auto lg:mx-0 border border-red-800/30 transition-opacity duration-500 ${
+                        posterLoaded ? 'opacity-100' : 'opacity-0 absolute inset-0'
                       }`}
-                      onLoad={() => setPosterLoaded(true)}
                       loading="lazy"
+                      style={{ display: posterLoaded ? 'block' : 'none' }}
                     />
                   </div>
                 </div>

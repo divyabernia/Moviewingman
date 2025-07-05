@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, Calendar, MapPin, Star, Film } from 'lucide-react';
 import { Person } from '../types/movie';
 import { getImageUrl, getYear } from '../services/omdb';
@@ -14,6 +14,19 @@ export const ActorProfile: React.FC<ActorProfileProps> = ({
   onClose,
   onMovieClick,
 }) => {
+  const [profileLoaded, setProfileLoaded] = useState(false);
+  const [profileUrl, setProfileUrl] = useState<string>('');
+
+  React.useEffect(() => {
+    const url = getImageUrl(person.profile_path);
+    setProfileUrl(url);
+    
+    const img = new Image();
+    img.onload = () => setProfileLoaded(true);
+    img.onerror = () => setProfileLoaded(true);
+    img.src = url;
+  }, [person.profile_path]);
+
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     e.currentTarget.src = 'https://via.placeholder.com/300x450/111111/666666?text=No+Image';
   };
@@ -36,11 +49,17 @@ export const ActorProfile: React.FC<ActorProfileProps> = ({
                 {/* Profile Image */}
                 <div className="flex-shrink-0">
                   <div className="w-80 h-80 rounded-full overflow-hidden border-4 border-red-500/30 shadow-2xl mx-auto">
+                    {!profileLoaded && (
+                      <div className="w-full h-full bg-gray-700 skeleton" />
+                    )}
                     <img
-                      src={getImageUrl(person.profile_path)}
+                      src={profileUrl}
                       alt={person.name}
                       onError={handleImageError}
-                      className="w-full h-full object-cover"
+                      className={`w-full h-full object-cover transition-opacity duration-500 ${
+                        profileLoaded ? 'opacity-100' : 'opacity-0 absolute inset-0'
+                      }`}
+                      style={{ display: profileLoaded ? 'block' : 'none' }}
                     />
                   </div>
                 </div>
