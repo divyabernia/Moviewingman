@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X, Star, Calendar, Clock, Plus, Trash2, Play, Award, Globe, DollarSign, Trophy, Film } from 'lucide-react';
 import { MovieDetails as MovieDetailsType, Movie } from '../types/movie';
 import { getImageUrl, getYear, formatRuntime } from '../services/omdb';
@@ -19,6 +19,9 @@ export const MovieDetails: React.FC<MovieDetailsProps> = ({
   onClose,
   onActorClick,
 }) => {
+  const [backdropLoaded, setBackdropLoaded] = useState(false);
+  const [posterLoaded, setPosterLoaded] = useState(false);
+
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     e.currentTarget.src = 'https://via.placeholder.com/300x450/111111/666666?text=No+Image';
   };
@@ -49,11 +52,18 @@ export const MovieDetails: React.FC<MovieDetailsProps> = ({
           <div className="bg-gradient-to-br from-red-950/90 to-black/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-2xl border border-red-800/30">
             {/* Header with backdrop */}
             <div className="relative h-80 md:h-96">
+              {!backdropLoaded && (
+                <div className="absolute inset-0 bg-gray-800 animate-pulse" />
+              )}
               <img
                 src={getImageUrl(movie.backdrop_path)}
                 alt={movie.title}
-                className="w-full h-full object-cover"
+                className={`w-full h-full object-cover transition-opacity duration-300 ${
+                  backdropLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
                 onError={handleImageError}
+                onLoad={() => setBackdropLoaded(true)}
+                loading="eager"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-red-950 via-red-950/70 to-transparent" />
               <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-transparent to-transparent" />
@@ -77,12 +87,21 @@ export const MovieDetails: React.FC<MovieDetailsProps> = ({
               <div className="flex flex-col lg:flex-row gap-12">
                 {/* Poster */}
                 <div className="flex-shrink-0">
-                  <img
-                    src={getImageUrl(movie.poster_path)}
-                    alt={movie.title}
-                    onError={handleImageError}
-                    className="w-64 h-96 object-cover rounded-xl shadow-2xl mx-auto lg:mx-0 border border-red-800/30"
-                  />
+                  <div className="relative w-64 h-96">
+                    {!posterLoaded && (
+                      <div className="absolute inset-0 bg-gray-700 animate-pulse rounded-xl" />
+                    )}
+                    <img
+                      src={getImageUrl(movie.poster_path)}
+                      alt={movie.title}
+                      onError={handleImageError}
+                      className={`w-64 h-96 object-cover rounded-xl shadow-2xl mx-auto lg:mx-0 border border-red-800/30 transition-opacity duration-300 ${
+                        posterLoaded ? 'opacity-100' : 'opacity-0'
+                      }`}
+                      onLoad={() => setPosterLoaded(true)}
+                      loading="lazy"
+                    />
+                  </div>
                 </div>
 
                 {/* Details */}
