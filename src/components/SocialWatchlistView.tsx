@@ -221,9 +221,9 @@ export const SocialWatchlistView: React.FC<SocialWatchlistViewProps> = ({
                     {movie.vote_average.toFixed(1)}
                   </span>
                 </div>
-              </div>
-                {/* Delete Button */}
-                <div className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+
+                {/* REMOVE BUTTON - ALWAYS VISIBLE */}
+                <div className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -235,6 +235,7 @@ export const SocialWatchlistView: React.FC<SocialWatchlistViewProps> = ({
                     <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                   </button>
                 </div>
+              </div>
 
               <div className="p-2 sm:p-3 md:p-4">
                 <h3 
