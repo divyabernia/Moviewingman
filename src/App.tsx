@@ -7,6 +7,9 @@ import { MovieDetails } from './components/MovieDetails';
 import { TrendingSection } from './components/TrendingSection';
 import { ActorProfile } from './components/ActorProfile';
 import { LoginScreen } from './components/LoginScreen';
+import { AISommelier } from './components/AISommelier';
+import { MovieDNA } from './components/MovieDNA';
+import { SmartRecommendations } from './components/SmartRecommendations';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { searchMovies, getTrendingMovies, getMovieDetails, getPersonDetails } from './services/omdb';
 import { Movie, MovieDetails as MovieDetailsType, Person } from './types/movie';
@@ -23,6 +26,9 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useLocalStorage<boolean>('user-logged-in', false);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [showAISommelier, setShowAISommelier] = useState(false);
+  const [showMovieDNA, setShowMovieDNA] = useState(false);
+  const [showSmartRecommendations, setShowSmartRecommendations] = useState(false);
 
   const handleSearch = useCallback(async (query: string) => {
     if (!query.trim()) {
@@ -151,6 +157,17 @@ function App() {
     setCurrentView('home');
   };
 
+  const handleMovieRecommendation = async (title: string) => {
+    try {
+      const results = await searchMovies(title);
+      if (results.length > 0) {
+        handleMovieClick(results[0].id);
+      }
+    } catch (error) {
+      console.error('Error finding recommended movie:', error);
+    }
+  };
+
   if (!isLoggedIn) {
     return <LoginScreen onLogin={handleLogin} />;
   }
@@ -186,6 +203,30 @@ function App() {
         />
       )}
 
+      {showAISommelier && (
+        <AISommelier
+          watchlist={watchlist}
+          onMovieRecommendation={handleMovieRecommendation}
+          onClose={() => setShowAISommelier(false)}
+        />
+      )}
+
+      {showMovieDNA && (
+        <MovieDNA
+          watchlist={watchlist}
+          onClose={() => setShowMovieDNA(false)}
+        />
+      )}
+
+      {showSmartRecommendations && (
+        <SmartRecommendations
+          watchlist={watchlist}
+          onMovieClick={handleMovieClick}
+          onToggleWatchlist={handleToggleWatchlist}
+          onClose={() => setShowSmartRecommendations(false)}
+        />
+      )}
+
       <main className="pt-16">
         {currentView === 'home' && (
           <>
@@ -200,6 +241,9 @@ function App() {
               onQueryChange={handleQueryChange}
               onToggleWatchlist={handleToggleWatchlist}
               showSearchResults={showSearchResults}
+              onShowAISommelier={() => setShowAISommelier(true)}
+              onShowMovieDNA={() => setShowMovieDNA(true)}
+              onShowSmartRecommendations={() => setShowSmartRecommendations(true)}
             />
             <TrendingSection
               movies={trendingMovies}
@@ -232,6 +276,8 @@ function App() {
               watchlist={watchlist}
               onToggleWatchlist={handleToggleWatchlist}
               onMovieClick={handleMovieClick}
+              onShowMovieDNA={() => setShowMovieDNA(true)}
+              onShowSmartRecommendations={() => setShowSmartRecommendations(true)}
             />
           </div>
         )}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Star, Heart, Trophy } from 'lucide-react';
+import { BookOpen, Star, Heart, Trophy, Brain, Zap, Dna } from 'lucide-react';
 import { MovieGrid } from './MovieGrid';
 import { Movie } from '../types/movie';
 
@@ -7,12 +7,16 @@ interface WatchlistSectionProps {
   watchlist: Movie[];
   onToggleWatchlist: (movie: Movie) => void;
   onMovieClick: (movieId: number) => void;
+  onShowMovieDNA: () => void;
+  onShowSmartRecommendations: () => void;
 }
 
 export const WatchlistSection: React.FC<WatchlistSectionProps> = ({
   watchlist,
   onToggleWatchlist,
   onMovieClick,
+  onShowMovieDNA,
+  onShowSmartRecommendations,
 }) => {
   const averageRating = watchlist.length > 0 
     ? (watchlist.reduce((sum, movie) => sum + movie.vote_average, 0) / watchlist.length).toFixed(1)
@@ -53,6 +57,26 @@ export const WatchlistSection: React.FC<WatchlistSectionProps> = ({
           <p className="text-gray-300 text-lg max-w-md mx-auto leading-relaxed">
             Build your personal collection of must-watch movies and never forget what to watch next
           </p>
+        )}
+
+        {/* AI Features */}
+        {watchlist.length > 0 && (
+          <div className="mt-8 flex justify-center gap-4">
+            <button
+              onClick={onShowMovieDNA}
+              className="px-6 py-3 bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-blue-500/30 text-blue-300 rounded-xl hover:from-blue-600/30 hover:to-purple-600/30 transition-all duration-200 flex items-center gap-3 transform hover:scale-105"
+            >
+              <Dna className="w-5 h-5" />
+              Analyze Movie DNA
+            </button>
+            <button
+              onClick={onShowSmartRecommendations}
+              className="px-6 py-3 bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 text-purple-300 rounded-xl hover:from-purple-600/30 hover:to-pink-600/30 transition-all duration-200 flex items-center gap-3 transform hover:scale-105"
+            >
+              <Brain className="w-5 h-5" />
+              Get AI Recommendations
+            </button>
+          </div>
         )}
       </div>
 

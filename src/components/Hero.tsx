@@ -16,6 +16,9 @@ interface HeroProps {
   onQueryChange: (query: string) => void;
   onToggleWatchlist: (movie: Movie) => void;
   showSearchResults: boolean;
+  onShowAISommelier: () => void;
+  onShowMovieDNA: () => void;
+  onShowSmartRecommendations: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({ 
@@ -29,6 +32,9 @@ export const Hero: React.FC<HeroProps> = ({
   onQueryChange,
   onToggleWatchlist,
   showSearchResults
+  onShowAISommelier,
+  onShowMovieDNA,
+  onShowSmartRecommendations,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -180,6 +186,31 @@ export const Hero: React.FC<HeroProps> = ({
               <button className="bg-black/40 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:bg-black/60 transition-all duration-200 border border-red-800/30">
                 <Play className="w-6 h-6" />
                 Watch Trailer
+              </button>
+              <button
+                onClick={onShowAISommelier}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transform hover:scale-105"
+              >
+                <Sparkles className="w-6 h-6" />
+                AI Sommelier
+              </button>
+            </div>
+
+            {/* Quick AI Features */}
+            <div className="mt-8 flex gap-3">
+              <button
+                onClick={onShowMovieDNA}
+                className="px-6 py-3 bg-blue-600/20 border border-blue-500/30 text-blue-300 rounded-xl hover:bg-blue-600/30 transition-all duration-200 flex items-center gap-2"
+              >
+                <Brain className="w-5 h-5" />
+                Movie DNA
+              </button>
+              <button
+                onClick={onShowSmartRecommendations}
+                className="px-6 py-3 bg-green-600/20 border border-green-500/30 text-green-300 rounded-xl hover:bg-green-600/30 transition-all duration-200 flex items-center gap-2"
+              >
+                <Zap className="w-5 h-5" />
+                Smart Picks
               </button>
             </div>
           </div>
