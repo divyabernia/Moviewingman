@@ -22,6 +22,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useLocalStorage<boolean>('user-logged-in', false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   const handleSearch = useCallback(async (query: string) => {
     if (!query.trim()) {
@@ -66,8 +67,12 @@ function App() {
       // Listen for hero search events
       const handleHeroSearch = (event: CustomEvent) => {
         const query = event.detail;
-        setSearchQuery(query);
-        setCurrentView('search');
+        if (query && query.trim()) {
+          setSearchQuery(query);
+          setCurrentView('search');
+          // Trigger search immediately
+          handleSearch(query);
+        }
       };
       
       window.addEventListener('heroSearch', handleHeroSearch as EventListener);
@@ -76,7 +81,7 @@ function App() {
         window.removeEventListener('heroSearch', handleHeroSearch as EventListener);
       };
     }
-  }, [loadTrendingMovies, isLoggedIn]);
+  }, [loadTrendingMovies, isLoggedIn, handleSearch]);
 
 
   const handleToggleWatchlist = (movie: Movie) => {
@@ -116,15 +121,13 @@ function App() {
     if (!query.trim()) {
       setSearchResults([]);
       setError(null);
+      setShowSearchResults(false);
     } else {
-      // Only change view, don't auto-search
-      if (currentView !== 'search') {
-        setCurrentView('search');
-      }
-      // Auto-search after a short delay for voice input
+      setShowSearchResults(true);
+      // Dynamic search with debouncing
       const timeoutId = setTimeout(() => {
         handleSearch(query);
-      }, 500);
+      }, 300);
       
       return () => clearTimeout(timeoutId);
     }
@@ -189,6 +192,14 @@ function App() {
             <Hero 
               trendingMovies={trendingMovies.slice(0, 5)}
               onMovieClick={handleMovieClick}
+              searchQuery={searchQuery}
+              searchResults={searchResults}
+              watchlist={watchlist}
+              loading={loading}
+              error={error}
+              onQueryChange={handleQueryChange}
+              onToggleWatchlist={handleToggleWatchlist}
+              showSearchResults={showSearchResults}
             />
             <TrendingSection
               movies={trendingMovies}
