@@ -138,20 +138,7 @@ export const searchMovies = async (query: string): Promise<any[]> => {
 };
 
 export const getTrendingMovies = async (): Promise<any[]> => {
-  try {
-    // Try IMDb first for trending movies since it has better trending data
-    console.log('Fetching trending movies from IMDb...');
-    const imdbResults = await getTrendingMoviesIMDb();
-    
-    if (imdbResults.length > 0) {
-      console.log('Successfully got trending movies from IMDb');
-      return imdbResults;
-    }
-  } catch (error) {
-    console.warn('IMDb trending failed, falling back to OMDb popular movies:', error);
-  }
-  
-  // Fallback to OMDb popular movies
+  // Use OMDb popular movies
   const popularMovies = [
     'Avengers Endgame', 'Spider-Man', 'The Dark Knight', 'Inception', 'Interstellar',
     'The Matrix', 'Pulp Fiction', 'The Godfather', 'Forrest Gump', 'Titanic',
