@@ -263,31 +263,10 @@ export const MovieDetails: React.FC<MovieDetailsProps> = ({
                     )}
 
                     {movie.production_companies && movie.production_companies.length > 0 && (
-                      <div className="bg-red-900/20 backdrop-blur-sm p-6 rounded-xl border border-red-800/30">
-                        <div className="flex items-center gap-3 mb-2">
-                          <Users className="w-5 h-5 text-blue-400" />
-                          <h4 className="font-bold text-white">Production</h4>
-                        </div>
-                        <p className="text-gray-300 font-semibold">
-                          {movie.production_companies.slice(0, 3).map(company => company.name).join(', ')}
                         </p>
                       </div>
                     )}
 
-                    {movie.spoken_languages && movie.spoken_languages.length > 0 && (
-                      <div className="bg-red-900/20 backdrop-blur-sm p-6 rounded-xl border border-red-800/30">
-                        <div className="flex items-center gap-3 mb-2">
-                          <Globe className="w-5 h-5 text-red-400" />
-                          <h4 className="font-bold text-white">Languages</h4>
-                        </div>
-                        <p className="text-gray-300 font-semibold">
-                          {movie.spoken_languages.map(lang => lang.english_name).join(', ')}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
