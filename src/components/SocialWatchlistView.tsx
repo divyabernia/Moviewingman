@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Filter, Search, Heart, Calendar, Star } from 'lucide-react';
+import { Users, Filter, Search, Heart, Calendar, Star, Trash2, X } from 'lucide-react';
 import { SocialWatchlistItem, SocialCategory, Friend } from '../types/movie';
 import { getImageUrl, getYear } from '../services/omdb';
 
