@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { searchMoviesIMDb, getTrendingMoviesIMDb, getMovieDetailsIMDb } from './imdb';
+import { getTrendingMoviesTMDb, getPersonDetailsTMDb, getTMDbImageUrl } from './tmdb';
 
 const OMDB_API_KEY = 'b00a7e04';
 const OMDB_BASE_URL = 'http://www.omdbapi.com/';
@@ -139,13 +140,26 @@ export const searchMovies = async (query: string): Promise<any[]> => {
 
 export const getTrendingMovies = async (): Promise<any[]> => {
   try {
-    console.log('Fetching trending movies from IMDb...');
-    const trendingMovies = await getTrendingMoviesIMDb();
-    console.log('Trending movies fetched from IMDb:', trendingMovies.length);
+    console.log('Fetching trending movies from TMDb...');
+    const trendingMovies = await getTrendingMoviesTMDb();
+    console.log('Trending movies fetched from TMDb:', trendingMovies.length);
     return trendingMovies;
   } catch (error) {
-    console.error('Error fetching trending movies:', error);
-    throw new Error('Failed to fetch trending movies. Please check your internet connection.');
+    console.error('Error fetching trending movies from TMDb:', error);
+    
+    // Try IMDb as backup
+    console.log('TMDb failed, trying IMDb as backup...');
+    try {
+      const imdbResults = await getTrendingMoviesIMDb();
+      if (imdbResults.length > 0) {
+        console.log('Successfully got trending movies from IMDb backup');
+        return imdbResults;
+      }
+    } catch (imdbError) {
+      console.error('IMDb backup also failed:', imdbError);
+    }
+    
+    throw new Error('Failed to fetch trending movies from both TMDb and IMDb. Please check your internet connection.');
   }
 };
 
@@ -220,26 +234,42 @@ export const getMovieDetails = async (movieId: number): Promise<any> => {
 };
 
 export const getPersonDetails = async (personId: number): Promise<any> => {
-  // OMDb doesn't support person details, so we'll return a mock response
-  return {
-    id: personId,
-    name: 'Actor Name',
-    biography: 'Biography not available with OMDb API.',
-    birthday: null,
-    place_of_birth: null,
-    popularity: 0,
-    profile_path: null,
-    known_for_department: 'Acting',
-    movie_credits: {
-      cast: [],
-      crew: [],
-    },
-  };
+  try {
+    console.log('Fetching person details from TMDb...');
+    const personDetails = await getPersonDetailsTMDb(personId);
+    console.log('Person details fetched from TMDb');
+    return personDetails;
+  } catch (error) {
+    console.error('Error fetching person details:', error);
+    
+    // Return a mock response as fallback
+    return {
+      id: personId,
+      name: 'Actor Name',
+      biography: 'Biography not available.',
+      birthday: null,
+      place_of_birth: null,
+      popularity: 0,
+      profile_path: null,
+      known_for_department: 'Acting',
+      movie_credits: {
+        cast: [],
+        crew: [],
+      },
+    };
+  }
 };
 
 export const getImageUrl = (path: string | null, size: string = 'w500'): string => {
   if (!path || path === 'N/A') return 'https://via.placeholder.com/500x750/1e293b/64748b?text=No+Image';
-  return path;
+  
+  // Check if it's a full URL (from OMDb/IMDb) or a relative path (from TMDb)
+  if (path.startsWith('http')) {
+    return path;
+  } else {
+    // It's a TMDb relative path
+    return getTMDbImageUrl(path, size);
+  }
 };
 
 export const getYear = (dateString: string): string => {
