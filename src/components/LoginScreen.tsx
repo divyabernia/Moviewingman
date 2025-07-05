@@ -39,6 +39,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
             </span>
           </div>
           <p className="text-gray-300 mt-2">Your ultimate movie watchlist</p>
+        </div>
 
         {/* Login Form */}
         <div className="bg-black/50 backdrop-blur-xl rounded-2xl p-8 border border-red-800/30 shadow-2xl">
