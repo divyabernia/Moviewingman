@@ -204,6 +204,7 @@ function App() {
         currentView={currentView}
         setCurrentView={setCurrentView}
         watchlistCount={watchlist.length}
+        socialWatchlistCount={socialWatchlist.length}
         searchQuery={searchQuery}
         onQueryChange={handleQueryChange}
         onManualSearch={handleManualSearch}

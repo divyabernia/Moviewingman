@@ -5,6 +5,7 @@ interface HeaderProps {
   currentView: 'home' | 'search' | 'watchlist' | 'trending' | 'social';
   setCurrentView: (view: 'home' | 'search' | 'watchlist' | 'trending' | 'social') => void;
   watchlistCount: number;
+  socialWatchlistCount: number;
   searchQuery: string;
   onQueryChange: (query: string) => void;
   onManualSearch: () => void;
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   currentView,
   setCurrentView,
   watchlistCount,
+  socialWatchlistCount,
   onLogout,
 }) => {
   return (
@@ -82,7 +84,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => setCurrentView('social')}
-              className={`px-6 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 font-semibold text-sm ${
+              className={`px-6 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 font-semibold text-sm relative ${
                 currentView === 'social'
                   ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg shadow-red-500/25'
                   : 'text-gray-300 hover:text-white hover:bg-red-900/30'
@@ -90,6 +92,11 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Users className="w-4 h-4" />
               <span>Social</span>
+              {socialWatchlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-red-400 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg">
+                  {socialWatchlistCount > 99 ? '99+' : socialWatchlistCount}
+                </span>
+              )}
             </button>
 
             <div className="w-px h-6 bg-red-800/30 mx-2"></div>
