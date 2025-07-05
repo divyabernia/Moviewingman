@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, Plus, Check, Trash2, Calendar, Eye, Heart } from 'lucide-react';
+import { Star, Plus, Check, Trash2, Calendar, Eye, Heart, Users } from 'lucide-react';
 import { Movie } from '../types/movie';
 import { getImageUrl, getYear } from '../services/omdb';
 
@@ -9,6 +9,7 @@ interface MovieCardProps {
   onToggleWatchlist: (movie: Movie) => void;
   onMovieClick: (movieId: number) => void;
   showRemoveButton?: boolean;
+  onSocialAdd?: (movie: Movie) => void;
 }
 
 export const MovieCard: React.FC<MovieCardProps> = ({
@@ -17,6 +18,7 @@ export const MovieCard: React.FC<MovieCardProps> = ({
   onToggleWatchlist,
   onMovieClick,
   showRemoveButton = false,
+  onSocialAdd,
 }) => {
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     e.currentTarget.src = 'https://via.placeholder.com/300x450/111111/666666?text=No+Image';
@@ -55,6 +57,18 @@ export const MovieCard: React.FC<MovieCardProps> = ({
             >
               <Eye className="w-5 h-5" />
             </button>
+            
+            {onSocialAdd && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSocialAdd(movie);
+                }}
+                className="w-12 h-12 bg-gradient-to-r from-purple-600 to-purple-500 text-white rounded-xl flex items-center justify-center hover:from-purple-700 hover:to-purple-600 transition-all duration-200 transform hover:scale-110 border border-purple-500/50"
+              >
+                <Users className="w-5 h-5" />
+              </button>
+            )}
             
             <button
               onClick={(e) => {

@@ -11,11 +11,14 @@ import { AISommelier } from './components/AISommelier';
 import { MovieDNA } from './components/MovieDNA';
 import { SmartRecommendations } from './components/SmartRecommendations';
 import { useLocalStorage } from './hooks/useLocalStorage';
+import { useSocialWatchlist } from './hooks/useSocialWatchlist';
+import { SocialWatchlistModal } from './components/SocialWatchlistModal';
+import { SocialWatchlistView } from './components/SocialWatchlistView';
 import { searchMovies, getTrendingMovies, getMovieDetails, getPersonDetails } from './services/omdb';
 import { Movie, MovieDetails as MovieDetailsType, Person } from './types/movie';
 
 function App() {
-  const [currentView, setCurrentView] = useState<'home' | 'search' | 'watchlist' | 'trending'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'search' | 'watchlist' | 'trending' | 'social'>('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
   const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
@@ -29,6 +32,18 @@ function App() {
   const [showAISommelier, setShowAISommelier] = useState(false);
   const [showMovieDNA, setShowMovieDNA] = useState(false);
   const [showSmartRecommendations, setShowSmartRecommendations] = useState(false);
+  const [showSocialModal, setShowSocialModal] = useState(false);
+  const [selectedMovieForSocial, setSelectedMovieForSocial] = useState<Movie | null>(null);
+
+  // Social watchlist hook
+  const {
+    socialWatchlist,
+    friends,
+    addToSocialWatchlist,
+    removeFromSocialWatchlist,
+    addFriend,
+    isInSocialWatchlist,
+  } = useSocialWatchlist();
 
   const handleSearch = useCallback(async (query: string) => {
     if (!query.trim()) {
@@ -168,6 +183,17 @@ function App() {
     }
   };
 
+  const handleSocialAdd = (movie: Movie) => {
+    setSelectedMovieForSocial(movie);
+    setShowSocialModal(true);
+  };
+
+  const handleSocialWatchlistAdd = (movie: Movie, categories: string[], taggedFriends: string[]) => {
+    addToSocialWatchlist(movie, categories, taggedFriends);
+    setShowSocialModal(false);
+    setSelectedMovieForSocial(null);
+  };
+
   if (!isLoggedIn) {
     return <LoginScreen onLogin={handleLogin} />;
   }
@@ -227,6 +253,20 @@ function App() {
         />
       )}
 
+      {showSocialModal && selectedMovieForSocial && (
+        <SocialWatchlistModal
+          movie={selectedMovieForSocial}
+          isOpen={showSocialModal}
+          onClose={() => {
+            setShowSocialModal(false);
+            setSelectedMovieForSocial(null);
+          }}
+          onAddToWatchlist={handleSocialWatchlistAdd}
+          friends={friends}
+          onAddFriend={addFriend}
+        />
+      )}
+
       <main className="pt-16">
         {currentView === 'home' && (
           <>
@@ -241,6 +281,7 @@ function App() {
               onQueryChange={handleQueryChange}
               onToggleWatchlist={handleToggleWatchlist}
               showSearchResults={showSearchResults}
+              onSocialAdd={handleSocialAdd}
               onShowAISommelier={() => setShowAISommelier(true)}
               onShowMovieDNA={() => setShowMovieDNA(true)}
               onShowSmartRecommendations={() => setShowSmartRecommendations(true)}
@@ -250,6 +291,7 @@ function App() {
               watchlist={watchlist}
               onToggleWatchlist={handleToggleWatchlist}
               onMovieClick={handleMovieClick}
+              onSocialAdd={handleSocialAdd}
             />
           </>
         )}
@@ -266,6 +308,7 @@ function App() {
               onManualSearch={handleManualSearch}
               onToggleWatchlist={handleToggleWatchlist}
               onMovieClick={handleMovieClick}
+              onSocialAdd={handleSocialAdd}
             />
           </div>
         )}
@@ -290,6 +333,18 @@ function App() {
               onToggleWatchlist={handleToggleWatchlist}
               onMovieClick={handleMovieClick}
               showTitle={true}
+              onSocialAdd={handleSocialAdd}
+            />
+          </div>
+        )}
+
+        {currentView === 'social' && (
+          <div className="container mx-auto px-4 py-8">
+            <SocialWatchlistView
+              socialWatchlist={socialWatchlist}
+              friends={friends}
+              onMovieClick={handleMovieClick}
+              onRemoveFromWatchlist={removeFromSocialWatchlist}
             />
           </div>
         )}

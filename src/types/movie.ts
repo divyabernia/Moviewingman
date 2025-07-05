@@ -115,3 +115,24 @@ export interface AppState {
   searchQuery: string;
   error: string | null;
 }
+
+export interface SocialCategory {
+  id: string;
+  name: 'Family' | 'Friends' | 'Spouse';
+  icon: string;
+  color: string;
+}
+
+export interface Friend {
+  id: string;
+  name: string;
+  category: 'Family' | 'Friends' | 'Spouse';
+  avatar?: string;
+}
+
+export interface SocialWatchlistItem extends Movie {
+  categories: string[];
+  taggedFriends: string[];
+  addedBy?: string;
+  dateAdded: string;
+}

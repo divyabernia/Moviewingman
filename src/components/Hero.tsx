@@ -16,6 +16,7 @@ interface HeroProps {
   onQueryChange: (query: string) => void;
   onToggleWatchlist: (movie: Movie) => void;
   showSearchResults: boolean;
+  onSocialAdd: (movie: Movie) => void;
   onShowAISommelier: () => void;
   onShowMovieDNA: () => void;
   onShowSmartRecommendations: () => void;
@@ -32,6 +33,7 @@ export const Hero: React.FC<HeroProps> = ({
   onQueryChange,
   onToggleWatchlist,
   showSearchResults,
+  onSocialAdd,
   onShowAISommelier,
   onShowMovieDNA,
   onShowSmartRecommendations,
@@ -251,6 +253,7 @@ export const Hero: React.FC<HeroProps> = ({
                 watchlist={watchlist}
                 onToggleWatchlist={onToggleWatchlist}
                 onMovieClick={onMovieClick}
+                onSocialAdd={onSocialAdd}
               />
             )}
             

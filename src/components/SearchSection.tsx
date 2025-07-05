@@ -14,6 +14,7 @@ interface SearchSectionProps {
   onManualSearch: () => void;
   onToggleWatchlist: (movie: Movie) => void;
   onMovieClick: (movieId: number) => void;
+  onSocialAdd?: (movie: Movie) => void;
 }
 
 export const SearchSection: React.FC<SearchSectionProps> = ({
@@ -26,6 +27,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
   onManualSearch,
   onToggleWatchlist,
   onMovieClick,
+  onSocialAdd,
 }) => {
   const handleVoiceTranscription = (transcription: string) => {
     if (transcription.trim()) {
@@ -126,6 +128,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
           watchlist={watchlist}
           onToggleWatchlist={onToggleWatchlist}
           onMovieClick={onMovieClick}
+          onSocialAdd={onSocialAdd}
         />
       )}
 

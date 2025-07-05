@@ -9,6 +9,7 @@ interface MovieGridProps {
   onToggleWatchlist: (movie: Movie) => void;
   onMovieClick: (movieId: number) => void;
   showRemoveButton?: boolean;
+  onSocialAdd?: (movie: Movie) => void;
 }
 
 export const MovieGrid: React.FC<MovieGridProps> = ({
@@ -17,6 +18,7 @@ export const MovieGrid: React.FC<MovieGridProps> = ({
   onToggleWatchlist,
   onMovieClick,
   showRemoveButton = false,
+  onSocialAdd,
 }) => {
   const isInWatchlist = (movie: Movie) => 
     watchlist.some(w => w.id === movie.id);
@@ -54,6 +56,7 @@ export const MovieGrid: React.FC<MovieGridProps> = ({
           onToggleWatchlist={onToggleWatchlist}
           onMovieClick={onMovieClick}
           showRemoveButton={showRemoveButton}
+          onSocialAdd={onSocialAdd}
         />
       ))}
     </div>

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Home, TrendingUp, BookOpen, LogOut } from 'lucide-react';
+import { Home, TrendingUp, BookOpen, LogOut, Users } from 'lucide-react';
 
 interface HeaderProps {
-  currentView: 'home' | 'search' | 'watchlist' | 'trending';
-  setCurrentView: (view: 'home' | 'search' | 'watchlist' | 'trending') => void;
+  currentView: 'home' | 'search' | 'watchlist' | 'trending' | 'social';
+  setCurrentView: (view: 'home' | 'search' | 'watchlist' | 'trending' | 'social') => void;
   watchlistCount: number;
   searchQuery: string;
   onQueryChange: (query: string) => void;
@@ -78,6 +78,18 @@ export const Header: React.FC<HeaderProps> = ({
                   {watchlistCount > 99 ? '99+' : watchlistCount}
                 </span>
               )}
+            </button>
+
+            <button
+              onClick={() => setCurrentView('social')}
+              className={`px-6 py-2 rounded-lg transition-all duration-200 flex items-center gap-2 font-semibold text-sm ${
+                currentView === 'social'
+                  ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg shadow-red-500/25'
+                  : 'text-gray-300 hover:text-white hover:bg-red-900/30'
+              }`}
+            >
+              <Users className="w-4 h-4" />
+              <span>Social</span>
             </button>
 
             <div className="w-px h-6 bg-red-800/30 mx-2"></div>

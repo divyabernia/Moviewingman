@@ -9,6 +9,7 @@ interface TrendingSectionProps {
   onToggleWatchlist: (movie: Movie) => void;
   onMovieClick: (movieId: number) => void;
   showTitle?: boolean;
+  onSocialAdd?: (movie: Movie) => void;
 }
 
 export const TrendingSection: React.FC<TrendingSectionProps> = ({
@@ -17,6 +18,7 @@ export const TrendingSection: React.FC<TrendingSectionProps> = ({
   onToggleWatchlist,
   onMovieClick,
   showTitle = false,
+  onSocialAdd,
 }) => {
   return (
     <section className="py-16 bg-gradient-to-b from-transparent to-red-950/30">
@@ -50,6 +52,7 @@ export const TrendingSection: React.FC<TrendingSectionProps> = ({
           watchlist={watchlist}
           onToggleWatchlist={onToggleWatchlist}
           onMovieClick={onMovieClick}
+          onSocialAdd={onSocialAdd}
         />
       </div>
     </section>
