@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { searchMoviesIMDb, getTrendingMoviesIMDb, getMovieDetailsIMDb } from './imdb';
-import { getTrendingMoviesTMDb, getPersonDetailsTMDb, getTMDbImageUrl } from './tmdb';
+import { searchMoviesTMDb, getTrendingMoviesTMDb, getMovieDetailsTMDb, getPersonDetailsTMDb, getTMDbImageUrl } from './tmdb';
 
 const OMDB_API_KEY = 'b00a7e04';
 const OMDB_BASE_URL = 'http://www.omdbapi.com/';
@@ -85,7 +84,19 @@ export const searchMovies = async (query: string): Promise<any[]> => {
   if (!query.trim()) return [];
   
   try {
-    console.log('Searching for:', query);
+    console.log('Searching TMDb for:', query);
+    const tmdbResults = await searchMoviesTMDb(query);
+    if (tmdbResults.length > 0) {
+      console.log('Found results from TMDb');
+      return tmdbResults;
+    }
+  } catch (tmdbError) {
+    console.error('TMDb search failed:', tmdbError);
+  }
+  
+  // Fallback to OMDb
+  try {
+    console.log('TMDb failed, trying OMDb as backup for:', query);
     const response = await omdbApi.get('', {
       params: {
         s: query.trim(),
@@ -102,39 +113,17 @@ export const searchMovies = async (query: string): Promise<any[]> => {
       );
     }
     
-    if (response.data.Error) {
-      console.warn('OMDb API Error:', response.data.Error);
-      
-      // Try IMDb as backup
-      console.log('Trying IMDb as backup...');
-      try {
-        const imdbResults = await searchMoviesIMDb(query);
-        if (imdbResults.length > 0) {
-          console.log('Found results from IMDb backup');
-          return imdbResults;
-        }
-      } catch (imdbError) {
-        console.warn('IMDb backup also failed:', imdbError);
-      }
-    }
-    
     return [];
-  } catch (error) {
-    console.error('Error searching movies:', error);
-    
-    // Try IMDb as backup
-    console.log('OMDb failed, trying IMDb as backup...');
+  } catch (omdbError) {
+    console.error('OMDb search also failed:', omdbError);
     try {
-      const imdbResults = await searchMoviesIMDb(query);
-      if (imdbResults.length > 0) {
-        console.log('Successfully got results from IMDb backup');
-        return imdbResults;
-      }
-    } catch (imdbError) {
-      console.error('IMDb backup also failed:', imdbError);
+      // Last resort: return some popular movies as suggestions
+      console.log('All search methods failed, returning trending movies as suggestions');
+      const trending = await getTrendingMoviesTMDb();
+      return trending.slice(0, 10);
+    } catch {
+      throw new Error('Failed to search movies. Please check your internet connection.');
     }
-    
-    throw new Error('Failed to search movies from both OMDb and IMDb. Please check your internet connection.');
   }
 };
 
@@ -146,89 +135,67 @@ export const getTrendingMovies = async (): Promise<any[]> => {
     return trendingMovies;
   } catch (error) {
     console.error('Error fetching trending movies from TMDb:', error);
-    
-    // Try IMDb as backup
-    console.log('TMDb failed, trying IMDb as backup...');
-    try {
-      const imdbResults = await getTrendingMoviesIMDb();
-      if (imdbResults.length > 0) {
-        console.log('Successfully got trending movies from IMDb backup');
-        return imdbResults;
-      }
-    } catch (imdbError) {
-      console.error('IMDb backup also failed:', imdbError);
-    }
-    
-    throw new Error('Failed to fetch trending movies from both TMDb and IMDb. Please check your internet connection.');
+    throw new Error('Failed to fetch trending movies. Please check your internet connection.');
   }
 };
 
 export const getMovieDetails = async (movieId: number): Promise<any> => {
   try {
-    // Convert numeric ID back to IMDb format
-    const imdbId = `tt${movieId.toString().padStart(7, '0')}`;
+    console.log('Fetching movie details from TMDb for ID:', movieId);
+    const tmdbDetails = await getMovieDetailsTMDb(movieId);
+    console.log('Successfully got movie details from TMDb');
+    return tmdbDetails;
+  } catch (tmdbError) {
+    console.error('TMDb movie details failed:', tmdbError);
     
-    console.log('Fetching movie details for:', imdbId);
-    const response = await omdbApi.get('', {
-      params: {
-        i: imdbId,
-        plot: 'full',
-      },
-    });
-    
-    console.log('Movie details response:', response.data);
-    
-    if (response.data.Response === 'True') {
-      const movie = convertOMDbToMovie(response.data);
-      return {
-        ...movie,
-        genres: response.data.Genre ? response.data.Genre.split(', ').map((name: string, index: number) => ({ id: index, name })) : [],
-        runtime: response.data.Runtime ? parseInt(response.data.Runtime.replace(' min', '')) : null,
-        tagline: response.data.Plot?.split('.')[0] + '.' || '',
-        budget: 0,
-        revenue: response.data.BoxOffice ? parseInt(response.data.BoxOffice.replace(/[$,]/g, '')) || 0 : 0,
-        production_companies: response.data.Production ? [{ id: 1, name: response.data.Production, logo_path: null, origin_country: 'US' }] : [],
-        spoken_languages: response.data.Language ? response.data.Language.split(', ').map((lang: string) => ({ english_name: lang, iso_639_1: '', name: lang })) : [],
-        credits: {
-          cast: response.data.Actors ? response.data.Actors.split(', ').map((name: string, index: number) => ({
-            id: index + 1,
-            name,
-            character: 'Actor',
-            profile_path: null,
-          })) : [],
-          crew: response.data.Director ? [{
-            id: 1,
-            name: response.data.Director,
-            job: 'Director',
-            profile_path: null,
-          }] : [],
+    // Fallback to OMDb
+    try {
+      // Convert numeric ID back to IMDb format
+      const imdbId = `tt${movieId.toString().padStart(7, '0')}`;
+      
+      console.log('TMDb failed, trying OMDb for movie details:', imdbId);
+      const response = await omdbApi.get('', {
+        params: {
+          i: imdbId,
+          plot: 'full',
         },
-        omdbData: response.data,
-      };
-    }
-    
-    // If OMDb fails, try IMDb as backup
-    console.log('OMDb failed, trying IMDb for movie details...');
-    try {
-      const imdbDetails = await getMovieDetailsIMDb(movieId);
-      console.log('Successfully got movie details from IMDb backup');
-      return imdbDetails;
-    } catch (imdbError) {
-      console.error('IMDb backup also failed:', imdbError);
-      throw new Error('Movie not found in both OMDb and IMDb');
-    }
-  } catch (error) {
-    console.error('Error fetching movie details:', error);
-    
-    // Try IMDb as backup
-    console.log('OMDb error, trying IMDb as backup...');
-    try {
-      const imdbDetails = await getMovieDetailsIMDb(movieId);
-      console.log('Successfully got movie details from IMDb backup');
-      return imdbDetails;
-    } catch (imdbError) {
-      console.error('IMDb backup also failed:', imdbError);
-      throw new Error('Failed to fetch movie details from both OMDb and IMDb. Please try again.');
+      });
+      
+      console.log('Movie details response from OMDb:', response.data);
+      
+      if (response.data.Response === 'True') {
+        const movie = convertOMDbToMovie(response.data);
+        return {
+          ...movie,
+          genres: response.data.Genre ? response.data.Genre.split(', ').map((name: string, index: number) => ({ id: index, name })) : [],
+          runtime: response.data.Runtime ? parseInt(response.data.Runtime.replace(' min', '')) : null,
+          tagline: response.data.Plot?.split('.')[0] + '.' || '',
+          budget: 0,
+          revenue: response.data.BoxOffice ? parseInt(response.data.BoxOffice.replace(/[$,]/g, '')) || 0 : 0,
+          production_companies: response.data.Production ? [{ id: 1, name: response.data.Production, logo_path: null, origin_country: 'US' }] : [],
+          spoken_languages: response.data.Language ? response.data.Language.split(', ').map((lang: string) => ({ english_name: lang, iso_639_1: '', name: lang })) : [],
+          credits: {
+            cast: response.data.Actors ? response.data.Actors.split(', ').map((name: string, index: number) => ({
+              id: index + 1,
+              name,
+              character: 'Actor',
+              profile_path: null,
+            })) : [],
+            crew: response.data.Director ? [{
+              id: 1,
+              name: response.data.Director,
+              job: 'Director',
+              profile_path: null,
+            }] : [],
+          },
+          omdbData: response.data,
+        };
+      }
+      
+      throw new Error('Movie not found in OMDb');
+    } catch (omdbError) {
+      console.error('OMDb backup also failed:', omdbError);
+      throw new Error('Failed to fetch movie details. Please try again.');
     }
   }
 };

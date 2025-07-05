@@ -1,17 +1,13 @@
 import axios from 'axios';
 
-const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY || '51c2dca8f803c3321a9cb62ad846194d';
+const TMDB_READ_ACCESS_TOKEN = import.meta.env.VITE_TMDB_READ_ACCESS_TOKEN || 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1MWMyZGNhOGY4MDNjMzMyMWE5Y2I2MmFkODQ2MTk0ZCIsIm5iZiI6MTc1MTY1MTM1NS41MDgsInN1YiI6IjY4NjgxNDFiM2RhZWU2MzFiNTlhMzQyMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.nvvZ0W9Jyqr3nMUNmlNMA03KDNSfTkBtMpRISr9kJlo';
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
-
-// Validate API key exists
-if (!TMDB_API_KEY) {
-  console.error('TMDb API key is missing. Please add VITE_TMDB_API_KEY to your .env file.');
-}
 
 const tmdbApi = axios.create({
   baseURL: TMDB_BASE_URL,
   headers: {
-    'Authorization': TMDB_API_KEY ? `Bearer ${TMDB_API_KEY}` : '',
+    'Authorization': `Bearer ${TMDB_READ_ACCESS_TOKEN}`,
     'Content-Type': 'application/json',
   },
 });
@@ -80,10 +76,6 @@ export const convertTMDbToMovie = (tmdbMovie: TMDbMovie): any => {
 
 export const getTrendingMoviesTMDb = async (): Promise<any[]> => {
   try {
-    if (!TMDB_API_KEY) {
-      throw new Error('TMDb API key is not configured');
-    }
-    
     console.log('Fetching trending movies from TMDb...');
     const response = await tmdbApi.get('/trending/movie/week');
     
@@ -100,6 +92,69 @@ export const getTrendingMoviesTMDb = async (): Promise<any[]> => {
   }
 };
 
+export const searchMoviesTMDb = async (query: string): Promise<any[]> => {
+  if (!query.trim()) return [];
+  
+  try {
+    console.log('Searching TMDb for:', query);
+    const response = await tmdbApi.get('/search/movie', {
+      params: {
+        query: query.trim(),
+        page: 1,
+        include_adult: false,
+      },
+    });
+    
+    console.log('TMDb search response:', response.data);
+    
+    if (response.data.results) {
+      return response.data.results.map((movie: TMDbMovie) => convertTMDbToMovie(movie));
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Error searching movies on TMDb:', error);
+    throw new Error('Failed to search movies on TMDb');
+  }
+};
+
+export const getMovieDetailsTMDb = async (movieId: number): Promise<any> => {
+  try {
+    console.log('Fetching movie details from TMDb for ID:', movieId);
+    
+    // Fetch movie details
+    const movieResponse = await tmdbApi.get(`/movie/${movieId}`, {
+      params: {
+        append_to_response: 'credits',
+      },
+    });
+    
+    const movie = movieResponse.data;
+    
+    return {
+      id: movie.id,
+      title: movie.title,
+      poster_path: movie.poster_path,
+      backdrop_path: movie.backdrop_path,
+      release_date: movie.release_date,
+      vote_average: Number(movie.vote_average.toFixed(1)),
+      vote_count: movie.vote_count,
+      overview: movie.overview,
+      genres: movie.genres || [],
+      runtime: movie.runtime,
+      tagline: movie.tagline || '',
+      budget: movie.budget || 0,
+      revenue: movie.revenue || 0,
+      production_companies: movie.production_companies || [],
+      spoken_languages: movie.spoken_languages || [],
+      credits: movie.credits || { cast: [], crew: [] },
+      imdb_id: movie.imdb_id,
+    };
+  } catch (error) {
+    console.error('Error fetching movie details from TMDb:', error);
+    throw new Error('Failed to fetch movie details from TMDb');
+  }
+};
 export const getPersonDetailsTMDb = async (personId: number): Promise<any> => {
   try {
     console.log('Fetching person details from TMDb for ID:', personId);
