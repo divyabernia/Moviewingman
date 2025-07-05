@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Dna, TrendingUp, Star, Calendar, Brain, Heart, Zap, Eye, Clock } from 'lucide-react';
+import { X, Dna, TrendingUp, Star, Calendar, Brain, Heart, Zap, Eye, Clock, Sparkles } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
