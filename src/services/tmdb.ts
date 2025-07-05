@@ -1,8 +1,13 @@
 import axios from 'axios';
 
-const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY || '51c2dca8f803c3321a9cb62ad846194d';
-const TMDB_READ_ACCESS_TOKEN = import.meta.env.VITE_TMDB_READ_ACCESS_TOKEN || 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1MWMyZGNhOGY4MDNjMzMyMWE5Y2I2MmFkODQ2MTk0ZCIsIm5iZiI6MTc1MTY1MTM1NS41MDgsInN1YiI6IjY4NjgxNDFiM2RhZWU2MzFiNTlhMzQyMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.nvvZ0W9Jyqr3nMUNmlNMA03KDNSfTkBtMpRISr9kJlo';
+const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const TMDB_READ_ACCESS_TOKEN = import.meta.env.VITE_TMDB_READ_ACCESS_TOKEN;
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
+
+// Check if API credentials are available
+const hasValidCredentials = () => {
+  return TMDB_READ_ACCESS_TOKEN && TMDB_READ_ACCESS_TOKEN !== 'your_tmdb_read_access_token_here';
+};
 
 const tmdbApi = axios.create({
   baseURL: TMDB_BASE_URL,
@@ -10,6 +15,7 @@ const tmdbApi = axios.create({
     'Authorization': `Bearer ${TMDB_READ_ACCESS_TOKEN}`,
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 second timeout
 });
 
 export interface TMDbMovie {
@@ -75,6 +81,11 @@ export const convertTMDbToMovie = (tmdbMovie: TMDbMovie): any => {
 };
 
 export const getTrendingMoviesTMDb = async (): Promise<any[]> => {
+  if (!hasValidCredentials()) {
+    console.warn('TMDb API credentials not configured, returning mock data');
+    return getMockTrendingMovies();
+  }
+
   try {
     console.log('Fetching trending movies from TMDb...');
     const response = await tmdbApi.get('/trending/movie/week');
@@ -88,12 +99,18 @@ export const getTrendingMoviesTMDb = async (): Promise<any[]> => {
     return [];
   } catch (error) {
     console.error('Error fetching trending movies from TMDb:', error);
-    throw new Error('Failed to fetch trending movies from TMDb');
+    console.warn('Falling back to mock trending movies');
+    return getMockTrendingMovies();
   }
 };
 
 export const searchMoviesTMDb = async (query: string, signal?: AbortSignal): Promise<any[]> => {
   if (!query.trim()) return [];
+  
+  if (!hasValidCredentials()) {
+    console.warn('TMDb API credentials not configured, returning mock search results');
+    return getMockSearchResults(query);
+  }
   
   try {
     console.log('Searching TMDb for:', query);
@@ -115,11 +132,17 @@ export const searchMoviesTMDb = async (query: string, signal?: AbortSignal): Pro
     return [];
   } catch (error) {
     console.error('Error searching movies on TMDb:', error);
-    throw new Error('Failed to search movies on TMDb');
+    console.warn('Falling back to mock search results');
+    return getMockSearchResults(query);
   }
 };
 
 export const getMovieDetailsTMDb = async (movieId: number): Promise<any> => {
+  if (!hasValidCredentials()) {
+    console.warn('TMDb API credentials not configured, returning mock movie details');
+    return getMockMovieDetails(movieId);
+  }
+
   try {
     console.log('Fetching movie details from TMDb for ID:', movieId);
     
@@ -153,10 +176,16 @@ export const getMovieDetailsTMDb = async (movieId: number): Promise<any> => {
     };
   } catch (error) {
     console.error('Error fetching movie details from TMDb:', error);
-    throw new Error('Failed to fetch movie details from TMDb');
+    console.warn('Falling back to mock movie details');
+    return getMockMovieDetails(movieId);
   }
 };
 export const getPersonDetailsTMDb = async (personId: number): Promise<any> => {
+  if (!hasValidCredentials()) {
+    console.warn('TMDb API credentials not configured, returning mock person details');
+    return getMockPersonDetails(personId);
+  }
+
   try {
     console.log('Fetching person details from TMDb for ID:', personId);
     
@@ -184,13 +213,112 @@ export const getPersonDetailsTMDb = async (personId: number): Promise<any> => {
     };
   } catch (error) {
     console.error('Error fetching person details from TMDb:', error);
-    throw new Error('Failed to fetch person details from TMDb');
+    console.warn('Falling back to mock person details');
+    return getMockPersonDetails(personId);
   }
 };
 
 export const getTMDbImageUrl = (path: string | null, size: string = 'w500'): string => {
   if (!path) return 'https://via.placeholder.com/500x750/1e293b/64748b?text=No+Image';
   return `https://image.tmdb.org/t/p/${size}${path}`;
+};
+
+// Mock data functions for when API is not available
+const getMockTrendingMovies = (): any[] => {
+  return [
+    {
+      id: 1,
+      title: "The Shawshank Redemption",
+      poster_path: "https://images.unsplash.com/photo-1489599735734-79b4ba5a1d6b?w=500&h=750&fit=crop",
+      backdrop_path: "https://images.unsplash.com/photo-1489599735734-79b4ba5a1d6b?w=1280&h=720&fit=crop",
+      release_date: "1994-09-23",
+      vote_average: 9.3,
+      vote_count: 2500000,
+      overview: "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
+      imdb_id: "tt0111161"
+    },
+    {
+      id: 2,
+      title: "The Godfather",
+      poster_path: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=500&h=750&fit=crop",
+      backdrop_path: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=1280&h=720&fit=crop",
+      release_date: "1972-03-24",
+      vote_average: 9.2,
+      vote_count: 1800000,
+      overview: "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
+      imdb_id: "tt0068646"
+    },
+    {
+      id: 3,
+      title: "The Dark Knight",
+      poster_path: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=750&fit=crop",
+      backdrop_path: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1280&h=720&fit=crop",
+      release_date: "2008-07-18",
+      vote_average: 9.0,
+      vote_count: 2700000,
+      overview: "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests.",
+      imdb_id: "tt0468569"
+    }
+  ];
+};
+
+const getMockSearchResults = (query: string): any[] => {
+  const mockMovies = getMockTrendingMovies();
+  return mockMovies.filter(movie => 
+    movie.title.toLowerCase().includes(query.toLowerCase())
+  );
+};
+
+const getMockMovieDetails = (movieId: number): any => {
+  const mockMovies = getMockTrendingMovies();
+  const movie = mockMovies.find(m => m.id === movieId) || mockMovies[0];
+  
+  return {
+    ...movie,
+    genres: [
+      { id: 18, name: "Drama" },
+      { id: 80, name: "Crime" }
+    ],
+    runtime: 142,
+    tagline: "Fear can hold you prisoner. Hope can set you free.",
+    budget: 25000000,
+    revenue: 16000000,
+    production_companies: [
+      { id: 1, name: "Castle Rock Entertainment", logo_path: null, origin_country: "US" }
+    ],
+    spoken_languages: [
+      { english_name: "English", iso_639_1: "en", name: "English" }
+    ],
+    credits: {
+      cast: [
+        { id: 1, name: "Tim Robbins", character: "Andy Dufresne", profile_path: null },
+        { id: 2, name: "Morgan Freeman", character: "Ellis Boyd 'Red' Redding", profile_path: null }
+      ],
+      crew: [
+        { id: 1, name: "Frank Darabont", job: "Director", profile_path: null }
+      ]
+    }
+  };
+};
+
+const getMockPersonDetails = (personId: number): any => {
+  return {
+    id: personId,
+    name: "Morgan Freeman",
+    biography: "Morgan Freeman is an American actor, director, and narrator. He has received various accolades, including an Academy Award, a Golden Globe Award, and a Screen Actors Guild Award.",
+    birthday: "1937-06-01",
+    place_of_birth: "Memphis, Tennessee, USA",
+    popularity: 25.5,
+    profile_path: null,
+    known_for_department: "Acting",
+    movie_credits: {
+      cast: getMockTrendingMovies().map(movie => ({
+        ...movie,
+        character: "Character Name"
+      })),
+      crew: []
+    }
+  };
 };
 
 // Re-export everything from omdb.ts to maintain compatibility

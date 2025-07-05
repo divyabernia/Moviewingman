@@ -1,14 +1,20 @@
 import axios from 'axios';
 import { searchMoviesTMDb, getTrendingMoviesTMDb, getMovieDetailsTMDb, getPersonDetailsTMDb, getTMDbImageUrl } from './tmdb';
 
-const OMDB_API_KEY = import.meta.env.VITE_OMDB_API_KEY || 'b00a7e04';
+const OMDB_API_KEY = import.meta.env.VITE_OMDB_API_KEY;
 const OMDB_BASE_URL = 'http://www.omdbapi.com/';
+
+// Check if OMDb API key is available
+const hasValidOMDbKey = () => {
+  return OMDB_API_KEY && OMDB_API_KEY !== 'your_omdb_api_key_here';
+};
 
 const omdbApi = axios.create({
   baseURL: OMDB_BASE_URL,
   params: {
     apikey: OMDB_API_KEY,
   },
+  timeout: 10000, // 10 second timeout
 });
 
 export interface OMDbMovie {
@@ -86,7 +92,7 @@ export const searchMovies = async (query: string, signal?: AbortSignal): Promise
   try {
     console.log('Searching TMDb for:', query);
     const tmdbResults = await searchMoviesTMDb(query, signal);
-    if (tmdbResults.length > 0) {
+    if (tmdbResults && tmdbResults.length > 0) {
       console.log('Found results from TMDb');
       return tmdbResults;
     }
@@ -94,37 +100,41 @@ export const searchMovies = async (query: string, signal?: AbortSignal): Promise
     console.error('TMDb search failed:', tmdbError);
   }
   
-  // Fallback to OMDb
-  try {
-    console.log('TMDb failed, trying OMDb as backup for:', query);
-    const response = await omdbApi.get('', {
-      params: {
-        s: query.trim(),
-        type: 'movie',
-        page: 1,
-      },
-      signal,
-    });
-    
-    console.log('OMDb Search Response:', response.data);
-    
-    if (response.data.Response === 'True' && response.data.Search) {
-      return response.data.Search.map((movie: OMDbSearchResult, index: number) => 
-        convertOMDbToMovie(movie, index)
-      );
-    }
-    
-    return [];
-  } catch (omdbError) {
-    console.error('OMDb search also failed:', omdbError);
+  // Fallback to OMDb only if we have a valid API key
+  if (hasValidOMDbKey()) {
     try {
-      // Last resort: return some popular movies as suggestions
-      console.log('All search methods failed, returning trending movies as suggestions');
-      const trending = await getTrendingMoviesTMDb();
-      return trending.slice(0, 10);
-    } catch {
-      throw new Error('Failed to search movies. Please check your internet connection.');
+      console.log('TMDb failed, trying OMDb as backup for:', query);
+      const response = await omdbApi.get('', {
+        params: {
+          s: query.trim(),
+          type: 'movie',
+          page: 1,
+        },
+        signal,
+      });
+      
+      console.log('OMDb Search Response:', response.data);
+      
+      if (response.data.Response === 'True' && response.data.Search) {
+        return response.data.Search.map((movie: OMDbSearchResult, index: number) => 
+          convertOMDbToMovie(movie, index)
+        );
+      }
+    } catch (omdbError) {
+      console.error('OMDb search also failed:', omdbError);
     }
+  } else {
+    console.warn('OMDb API key not configured, skipping OMDb search');
+  }
+  
+  // Last resort: return some popular movies as suggestions
+  try {
+    console.log('All search methods failed, returning trending movies as suggestions');
+    const trending = await getTrendingMoviesTMDb();
+    return trending ? trending.slice(0, 10) : [];
+  } catch {
+    console.warn('All movie search methods failed, returning empty results');
+    return [];
   }
 };
 
@@ -132,11 +142,12 @@ export const getTrendingMovies = async (): Promise<any[]> => {
   try {
     console.log('Fetching trending movies from TMDb...');
     const trendingMovies = await getTrendingMoviesTMDb();
-    console.log('Trending movies fetched from TMDb:', trendingMovies.length);
-    return trendingMovies;
+    console.log('Trending movies fetched from TMDb:', trendingMovies ? trendingMovies.length : 0);
+    return trendingMovies || [];
   } catch (error) {
     console.error('Error fetching trending movies from TMDb:', error);
-    throw new Error('Failed to fetch trending movies. Please check your internet connection.');
+    console.warn('Returning empty trending movies list');
+    return [];
   }
 };
 
@@ -144,12 +155,16 @@ export const getMovieDetails = async (movieId: number): Promise<any> => {
   try {
     console.log('Fetching movie details from TMDb for ID:', movieId);
     const tmdbDetails = await getMovieDetailsTMDb(movieId);
-    console.log('Successfully got movie details from TMDb');
-    return tmdbDetails;
+    if (tmdbDetails) {
+      console.log('Successfully got movie details from TMDb');
+      return tmdbDetails;
+    }
   } catch (tmdbError) {
     console.error('TMDb movie details failed:', tmdbError);
+  }
     
-    // Fallback to OMDb
+  // Fallback to OMDb only if we have a valid API key
+  if (hasValidOMDbKey()) {
     try {
       // Convert numeric ID back to IMDb format
       const imdbId = `tt${movieId.toString().padStart(7, '0')}`;
@@ -196,36 +211,44 @@ export const getMovieDetails = async (movieId: number): Promise<any> => {
       throw new Error('Movie not found in OMDb');
     } catch (omdbError) {
       console.error('OMDb backup also failed:', omdbError);
-      throw new Error('Failed to fetch movie details. Please try again.');
     }
+  } else {
+    console.warn('OMDb API key not configured, skipping OMDb fallback');
   }
+  
+  // Return mock data as final fallback
+  console.warn('All movie detail methods failed, returning mock data');
+  return getMockMovieDetails(movieId);
 };
 
 export const getPersonDetails = async (personId: number): Promise<any> => {
   try {
     console.log('Fetching person details from TMDb...');
     const personDetails = await getPersonDetailsTMDb(personId);
-    console.log('Person details fetched from TMDb');
-    return personDetails;
+    if (personDetails) {
+      console.log('Person details fetched from TMDb');
+      return personDetails;
+    }
   } catch (error) {
     console.error('Error fetching person details:', error);
-    
-    // Return a mock response as fallback
-    return {
-      id: personId,
-      name: 'Actor Name',
-      biography: 'Biography not available.',
-      birthday: null,
-      place_of_birth: null,
-      popularity: 0,
-      profile_path: null,
-      known_for_department: 'Acting',
-      movie_credits: {
-        cast: [],
-        crew: [],
-      },
-    };
   }
+  
+  // Return a mock response as fallback
+  console.warn('Returning mock person details');
+  return {
+    id: personId,
+    name: 'Actor Name',
+    biography: 'Biography not available.',
+    birthday: null,
+    place_of_birth: null,
+    popularity: 0,
+    profile_path: null,
+    known_for_department: 'Acting',
+    movie_credits: {
+      cast: [],
+      crew: [],
+    },
+  };
 };
 
 export const getImageUrl = (path: string | null, size: string = 'w500'): string => {
@@ -248,4 +271,39 @@ export const formatRuntime = (minutes: number): string => {
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
   return `${hours}h ${remainingMinutes}m`;
+};
+
+// Mock data function for movie details fallback
+const getMockMovieDetails = (movieId: number): any => {
+  return {
+    id: movieId,
+    title: "Sample Movie",
+    poster_path: "https://images.unsplash.com/photo-1489599735734-79b4ba5a1d6b?w=500&h=750&fit=crop",
+    backdrop_path: "https://images.unsplash.com/photo-1489599735734-79b4ba5a1d6b?w=1280&h=720&fit=crop",
+    release_date: "2023-01-01",
+    vote_average: 7.5,
+    vote_count: 1000,
+    overview: "This is a sample movie description. The actual movie data could not be loaded due to API connectivity issues.",
+    genres: [
+      { id: 18, name: "Drama" },
+      { id: 28, name: "Action" }
+    ],
+    runtime: 120,
+    tagline: "A sample movie tagline",
+    budget: 0,
+    revenue: 0,
+    production_companies: [],
+    spoken_languages: [
+      { english_name: "English", iso_639_1: "en", name: "English" }
+    ],
+    credits: {
+      cast: [
+        { id: 1, name: "Sample Actor", character: "Main Character", profile_path: null }
+      ],
+      crew: [
+        { id: 1, name: "Sample Director", job: "Director", profile_path: null }
+      ]
+    },
+    imdb_id: `tt${movieId.toString().padStart(7, '0')}`
+  };
 };
