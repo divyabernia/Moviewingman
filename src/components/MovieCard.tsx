@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Star, Plus, Check, Trash2, Calendar, Eye, Heart, Users } from 'lucide-react';
 import { Movie } from '../types/movie';
 import { getImageUrl, getYear } from '../services/omdb';
