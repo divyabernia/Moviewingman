@@ -31,7 +31,7 @@ export const Hero: React.FC<HeroProps> = ({
   error,
   onQueryChange,
   onToggleWatchlist,
-  showSearchResults
+  showSearchResults,
   onShowAISommelier,
   onShowMovieDNA,
   onShowSmartRecommendations,
