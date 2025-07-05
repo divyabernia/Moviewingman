@@ -7,6 +7,7 @@ interface HeaderProps {
   watchlistCount: number;
   searchQuery: string;
   onQueryChange: (query: string) => void;
+  onManualSearch: () => void;
   loading: boolean;
   onLogout: () => void;
 }

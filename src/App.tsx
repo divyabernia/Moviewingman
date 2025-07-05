@@ -75,18 +75,6 @@ function App() {
     }
   }, [loadTrendingMovies, isLoggedIn]);
 
-  useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      handleSearch(searchQuery);
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, handleSearch]);
 
   const handleToggleWatchlist = (movie: Movie) => {
     setWatchlist(prev => {
@@ -120,11 +108,24 @@ function App() {
 
   const handleQueryChange = (query: string) => {
     setSearchQuery(query);
-    if (query.trim()) {
-      setCurrentView('search');
+    
+    // Clear results if query is empty
+    if (!query.trim()) {
+      setSearchResults([]);
+      setError(null);
+    } else {
+      // Only change view, don't auto-search
+      if (currentView !== 'search') {
+        setCurrentView('search');
+      }
     }
   };
 
+  const handleManualSearch = () => {
+    if (searchQuery.trim()) {
+      handleSearch(searchQuery);
+    }
+  };
   const handleCloseDetails = () => {
     setSelectedMovie(null);
   };
@@ -150,6 +151,7 @@ function App() {
         watchlistCount={watchlist.length}
         searchQuery={searchQuery}
         onQueryChange={handleQueryChange}
+        onManualSearch={handleManualSearch}
         loading={loading}
         onLogout={() => setIsLoggedIn(false)}
       />
@@ -197,6 +199,7 @@ function App() {
               loading={loading}
               error={error}
               onQueryChange={handleQueryChange}
+              onManualSearch={handleManualSearch}
               onToggleWatchlist={handleToggleWatchlist}
               onMovieClick={handleMovieClick}
             />

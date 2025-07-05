@@ -29,11 +29,11 @@ export const Hero: React.FC<HeroProps> = ({ trendingMovies, onMovieClick }) => {
       // Trigger search by dispatching custom event
       const searchEvent = new CustomEvent('heroSearch', { detail: searchQuery });
       window.dispatchEvent(searchEvent);
+      setSearchQuery(''); // Clear the search input after submitting
     }
   };
 
   const handleVoiceTranscription = (transcription: string) => {
-    setSearchQuery(transcription);
     // Auto-trigger search after voice input
     const searchEvent = new CustomEvent('heroSearch', { detail: transcription });
     window.dispatchEvent(searchEvent);

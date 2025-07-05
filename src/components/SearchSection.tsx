@@ -11,6 +11,7 @@ interface SearchSectionProps {
   loading: boolean;
   error: string | null;
   onQueryChange: (query: string) => void;
+  onManualSearch: () => void;
   onToggleWatchlist: (movie: Movie) => void;
   onMovieClick: (movieId: number) => void;
 }
@@ -22,6 +23,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
   loading,
   error,
   onQueryChange,
+  onManualSearch,
   onToggleWatchlist,
   onMovieClick,
 }) => {
@@ -41,24 +43,32 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
         
         {/* Enhanced Search Bar */}
         <div className="max-w-2xl mx-auto mb-8">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
-            <input
-              type="text"
-              placeholder="Search for movies, actors, directors..."
-              value={searchQuery}
-              onChange={(e) => onQueryChange(e.target.value)}
-              className="w-full pl-14 pr-20 py-5 bg-red-950/30 border border-red-800/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 backdrop-blur-sm transition-all duration-200 text-lg"
-            />
-            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-              <VoiceSearchButton onTranscription={handleVoiceTranscription} />
-            </div>
-            {loading && (
-              <div className="absolute right-20 top-1/2 transform -translate-y-1/2">
-                <div className="animate-spin rounded-full h-6 w-6 border-2 border-red-500 border-t-transparent"></div>
+          <form onSubmit={(e) => { e.preventDefault(); onManualSearch(); }}>
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+              <input
+                type="text"
+                placeholder="Search for movies, actors, directors..."
+                value={searchQuery}
+                onChange={(e) => onQueryChange(e.target.value)}
+                className="w-full pl-14 pr-32 py-5 bg-red-950/30 border border-red-800/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 backdrop-blur-sm transition-all duration-200 text-lg"
+              />
+              <div className="absolute right-16 top-1/2 transform -translate-y-1/2">
+                <VoiceSearchButton onTranscription={handleVoiceTranscription} />
               </div>
-            )}
-          </div>
+              <button
+                type="submit"
+                disabled={!searchQuery.trim() || loading}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-xl flex items-center justify-center hover:from-red-700 hover:to-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                ) : (
+                  <Search className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+          </form>
         </div>
 
         {searchQuery && (
