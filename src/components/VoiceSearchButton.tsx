@@ -68,11 +68,11 @@ export const VoiceSearchButton: React.FC<VoiceSearchButtonProps> = ({
   const hasError = recordingError || transcriptionError;
 
   return (
-    <div className="relative">
+    <div className="relative flex-shrink-0">
       <button
         onClick={handleVoiceSearch}
         disabled={disabled || isLoading}
-        className={`relative w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 border ${
+        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-200 transform hover:scale-105 border flex-shrink-0 ${
           isRecording
             ? 'bg-gradient-to-r from-red-600 to-red-500 text-white border-red-500/50 animate-pulse shadow-lg shadow-red-500/25'
             : hasError
@@ -82,34 +82,34 @@ export const VoiceSearchButton: React.FC<VoiceSearchButtonProps> = ({
         title={isRecording ? 'Click to stop recording' : 'Click to start voice search'}
       >
         {isLoading ? (
-          <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 animate-spin" />
+          <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
         ) : isRecording ? (
-          <MicOff className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+          <MicOff className="w-3 h-3 sm:w-4 sm:h-4" />
         ) : hasError ? (
-          <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+          <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" />
         ) : (
-          <Mic className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
+          <Mic className="w-3 h-3 sm:w-4 sm:h-4" />
         )}
         
         {/* Recording indicator */}
         {isRecording && (
-          <div className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse"></div>
+          <div className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full animate-pulse"></div>
         )}
       </button>
 
       {/* Status tooltip */}
       {(isRecording || isTranscribing || hasError) && (
-        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 sm:px-3 py-1 sm:py-2 bg-black/90 backdrop-blur-sm text-white text-xs sm:text-sm rounded-lg border border-red-800/30 whitespace-nowrap z-10 max-w-48">
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-2 sm:px-3 py-1 sm:py-2 bg-black/90 backdrop-blur-sm text-white text-xs sm:text-sm rounded-lg border border-red-800/30 whitespace-nowrap z-20 max-w-48">
           {isRecording && (
             <div className="flex items-center gap-2">
               <Volume2 className="w-3 h-3 sm:w-4 sm:h-4 text-red-400" />
-              <span>Listening... Click to stop</span>
+              <span>Listening...</span>
             </div>
           )}
           {isTranscribing && (
             <div className="flex items-center gap-2">
               <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin text-blue-400" />
-              <span>Transcribing audio...</span>
+              <span>Transcribing...</span>
             </div>
           )}
           {hasError && (
