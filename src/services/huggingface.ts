@@ -23,6 +23,7 @@ export const transcribeAudio = async (audioBlob: Blob): Promise<string> => {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${HF_API_KEY}`,
+        'Content-Type': 'audio/wav',
       },
       body: audioBuffer,
     });
