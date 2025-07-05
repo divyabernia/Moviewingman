@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Play, Home, TrendingUp, BookOpen, LogOut } from 'lucide-react';
+import { Home, TrendingUp, BookOpen, LogOut } from 'lucide-react';
 
 interface HeaderProps {
   currentView: 'home' | 'search' | 'watchlist' | 'trending';
@@ -27,15 +27,11 @@ export const Header: React.FC<HeaderProps> = ({
             className="flex items-center gap-3 cursor-pointer group"
             onClick={() => setCurrentView('home')}
           >
-            <div className="relative w-10 h-10 bg-gradient-to-r from-red-600 to-red-500 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform shadow-lg shadow-red-500/25">
-              <Heart className="w-6 h-6 text-white fill-current" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Play className="w-3 h-3 text-white fill-current ml-0.5" />
-              </div>
-            </div>
-            <span className="text-xl font-black bg-gradient-to-r from-red-400 to-red-300 bg-clip-text text-transparent">
-              CineVault
-            </span>
+            <img 
+              src="/WhatsApp Image 2025-07-05 at 17.00.17.jpeg" 
+              alt="CineVault Logo" 
+              className="h-12 w-auto group-hover:scale-105 transition-transform"
+            />
           </div>
 
           {/* Navigation */}
