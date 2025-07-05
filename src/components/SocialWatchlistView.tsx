@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, Filter, Search, Heart, Calendar, Star, Trash2, X } from 'lucide-react';
+import { Users, Filter, Search, Heart, Calendar, Star, Trash2, X, RotateCcw } from 'lucide-react';
 import { SocialWatchlistItem, SocialCategory, Friend } from '../types/movie';
 import { getImageUrl, getYear } from '../services/omdb';
 
@@ -58,6 +58,14 @@ export const SocialWatchlistView: React.FC<SocialWatchlistViewProps> = ({
     return category?.icon || '📁';
   };
 
+  const clearAllFilters = () => {
+    setSelectedCategory('all');
+    setSelectedFriend('all');
+    setSearchQuery('');
+  };
+
+  const hasActiveFilters = selectedCategory !== 'all' || selectedFriend !== 'all' || searchQuery.trim() !== '';
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -75,6 +83,22 @@ export const SocialWatchlistView: React.FC<SocialWatchlistViewProps> = ({
 
       {/* Filters */}
       <div className="bg-red-900/20 backdrop-blur-sm rounded-xl p-6 border border-red-800/30">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-white font-semibold flex items-center gap-2">
+            <Filter className="w-5 h-5 text-red-400" />
+            Filters
+          </h3>
+          {hasActiveFilters && (
+            <button
+              onClick={clearAllFilters}
+              className="px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-300 rounded-xl hover:bg-red-600/30 transition-all duration-200 flex items-center gap-2 text-sm"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Clear Filters
+            </button>
+          )}
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search */}
           <div className="relative">
@@ -116,6 +140,48 @@ export const SocialWatchlistView: React.FC<SocialWatchlistViewProps> = ({
             ))}
           </select>
         </div>
+        
+        {/* Active Filters Display */}
+        {hasActiveFilters && (
+          <div className="mt-4 pt-4 border-t border-red-800/30">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-red-300 text-sm font-medium">Active filters:</span>
+              {searchQuery.trim() && (
+                <span className="px-3 py-1 bg-blue-600/20 border border-blue-500/30 text-blue-300 rounded-full text-sm flex items-center gap-2">
+                  Search: "{searchQuery}"
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="hover:text-blue-100 transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {selectedCategory !== 'all' && (
+                <span className="px-3 py-1 bg-purple-600/20 border border-purple-500/30 text-purple-300 rounded-full text-sm flex items-center gap-2">
+                  Category: {getCategoryName(selectedCategory)}
+                  <button
+                    onClick={() => setSelectedCategory('all')}
+                    className="hover:text-purple-100 transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+              {selectedFriend !== 'all' && (
+                <span className="px-3 py-1 bg-green-600/20 border border-green-500/30 text-green-300 rounded-full text-sm flex items-center gap-2">
+                  Friend: {getFriendName(selectedFriend)}
+                  <button
+                    onClick={() => setSelectedFriend('all')}
+                    className="hover:text-green-100 transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Movies Grid */}
