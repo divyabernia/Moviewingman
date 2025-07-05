@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { SearchSection } from './components/SearchSection';
@@ -37,7 +37,7 @@ function App() {
   const [showSocialModal, setShowSocialModal] = useState(false);
   const [selectedMovieForSocial, setSelectedMovieForSocial] = useState<Movie | null>(null);
   const [isSearching, setIsSearching] = useState(false);
-  const [searchAbortController, setSearchAbortController] = useState<AbortController | null>(null);
+  const searchAbortControllerRef = useRef<AbortController | null>(null);
 
   // Debounce search query to prevent excessive API calls
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
@@ -59,12 +59,17 @@ function App() {
     if (!query.trim()) {
       setSearchResults([]);
       setIsSearching(false);
+      // Cancel any ongoing search when query is cleared
+      if (searchAbortControllerRef.current) {
+        searchAbortControllerRef.current.abort();
+        searchAbortControllerRef.current = null;
+      }
       return;
     }
 
     // Cancel previous search if still running
-    if (searchAbortController) {
-      searchAbortController.abort();
+    if (searchAbortControllerRef.current) {
+      searchAbortControllerRef.current.abort();
     }
 
     // Check cache first
@@ -78,7 +83,7 @@ function App() {
 
     // Create new abort controller for this search
     const abortController = new AbortController();
-    setSearchAbortController(abortController);
+    searchAbortControllerRef.current = abortController;
     
     setIsSearching(true);
     setError(null);
@@ -94,9 +99,12 @@ function App() {
       }
     } finally {
       setIsSearching(false);
-      setSearchAbortController(null);
+      // Only clear the ref if this is still the current controller
+      if (searchAbortControllerRef.current === abortController) {
+        searchAbortControllerRef.current = null;
+      }
     }
-  }, [searchAbortController, getCachedResults, setCachedResults]);
+  }, [getCachedResults, setCachedResults]);
 
   // Effect for debounced search
   useEffect(() => {
