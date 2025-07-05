@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const IMDB_BASE_URL = 'https://imdb-api.com/en/API';
-const IMDB_API_KEY = 'k_12345678'; // Placeholder API key
+const IMDB_API_KEY = import.meta.env.VITE_IMDB_API_KEY || 'k_12345678';
 
 const imdbApi = axios.create({
   baseURL: IMDB_BASE_URL,

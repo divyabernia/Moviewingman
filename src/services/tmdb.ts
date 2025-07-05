@@ -3,10 +3,15 @@ import axios from 'axios';
 const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 
+// Validate API key exists
+if (!TMDB_API_KEY) {
+  console.error('TMDb API key is missing. Please add VITE_TMDB_API_KEY to your .env file.');
+}
+
 const tmdbApi = axios.create({
   baseURL: TMDB_BASE_URL,
   headers: {
-    'Authorization': `Bearer ${TMDB_API_KEY}`,
+    'Authorization': TMDB_API_KEY ? `Bearer ${TMDB_API_KEY}` : '',
     'Content-Type': 'application/json',
   },
 });
@@ -75,6 +80,10 @@ export const convertTMDbToMovie = (tmdbMovie: TMDbMovie): any => {
 
 export const getTrendingMoviesTMDb = async (): Promise<any[]> => {
   try {
+    if (!TMDB_API_KEY) {
+      throw new Error('TMDb API key is not configured');
+    }
+    
     console.log('Fetching trending movies from TMDb...');
     const response = await tmdbApi.get('/trending/movie/week');
     
