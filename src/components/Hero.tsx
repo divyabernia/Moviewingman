@@ -70,29 +70,29 @@ export const Hero: React.FC<HeroProps> = ({
 
   if (trendingMovies.length === 0) {
     return (
-      <div className="relative h-[60vh] bg-gradient-to-br from-red-900 via-black to-red-950 flex items-center justify-center">
+      <div className="relative h-[50vh] sm:h-[60vh] bg-gradient-to-br from-red-900 via-black to-red-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="w-24 h-24 bg-gradient-to-r from-red-600/20 to-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-6 border border-red-800/30">
-            <Search className="w-12 h-12 text-red-400" />
+          <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-r from-red-600/20 to-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-4 sm:mb-6 border border-red-800/30">
+            <Search className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-red-400" />
           </div>
-          <h3 className="text-3xl font-bold text-white mb-4">Welcome to CineVault</h3>
-          <p className="text-gray-300 text-lg max-w-md mx-auto leading-relaxed mb-8">
+          <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4 px-4">Welcome to CineVault</h3>
+          <p className="text-gray-300 text-base sm:text-lg max-w-md mx-auto leading-relaxed mb-6 sm:mb-8 px-4">
             Your ultimate movie watchlist and discovery platform
           </p>
           
           {/* Search Bar */}
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto px-4">
             <form onSubmit={handleSearch}>
               <div className="relative">
-                <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+                <Search className="absolute left-4 sm:left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 sm:w-6 sm:h-6" />
                 <input
                   type="text"
                   placeholder="Search for movies, actors, directors..."
                   value={searchQuery}
                   onChange={(e) => onQueryChange(e.target.value)}
-                  className="w-full pl-16 pr-6 py-5 bg-black/40 backdrop-blur-sm border border-red-800/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 transition-all duration-200 text-lg"
+                  className="w-full pl-12 sm:pl-16 pr-4 sm:pr-6 py-3 sm:py-4 md:py-5 bg-black/40 backdrop-blur-sm border border-red-800/50 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 transition-all duration-200 text-base sm:text-lg"
                 />
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                <div className="absolute right-3 sm:right-4 top-1/2 transform -translate-y-1/2">
                   <VoiceSearchButton onTranscription={handleVoiceTranscription} />
                 </div>
               </div>
@@ -106,7 +106,7 @@ export const Hero: React.FC<HeroProps> = ({
   const currentMovie = trendingMovies[currentIndex];
 
   return (
-    <div className="relative h-[85vh] overflow-hidden">
+    <div className="relative h-[70vh] sm:h-[80vh] lg:h-[85vh] overflow-hidden">
       <div 
         className="absolute inset-0 bg-cover bg-center transition-all duration-1000 scale-105"
         style={{
@@ -121,93 +121,95 @@ export const Hero: React.FC<HeroProps> = ({
         <div className="container mx-auto px-4">
           <div className="max-w-4xl">
             {/* Search Bar */}
-            <div className="mb-8">
+            <div className="mb-6 sm:mb-8">
               <form onSubmit={handleSearch} className="max-w-2xl relative">
                 <div className="relative">
-                  <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+                  <Search className="absolute left-4 sm:left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 sm:w-6 sm:h-6" />
                   <input
                     type="text"
                     placeholder="Search for movies, actors, directors..."
                     value={searchQuery}
                     onChange={(e) => onQueryChange(e.target.value)}
-                    className="w-full pl-16 pr-32 py-5 bg-black/40 backdrop-blur-sm border border-red-800/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 transition-all duration-200 text-lg"
+                    className="w-full pl-12 sm:pl-16 pr-24 sm:pr-32 py-3 sm:py-4 md:py-5 bg-black/40 backdrop-blur-sm border border-red-800/50 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 transition-all duration-200 text-base sm:text-lg"
                   />
-                  <div className="absolute right-16 top-1/2 transform -translate-y-1/2">
+                  <div className="absolute right-12 sm:right-16 top-1/2 transform -translate-y-1/2">
                     <VoiceSearchButton onTranscription={handleVoiceTranscription} />
                   </div>
                   <button
                     type="submit"
                     disabled={!searchQuery.trim()}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-xl flex items-center justify-center hover:from-red-700 hover:to-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg shadow-red-500/25"
+                    className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg sm:rounded-xl flex items-center justify-center hover:from-red-700 hover:to-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg shadow-red-500/25"
                   >
-                    <Search className="w-5 h-5" />
+                    <Search className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                   <button
                     type="submit"
                     disabled={!searchQuery.trim()}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-xl flex items-center justify-center hover:from-red-700 hover:to-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg shadow-red-500/25"
+                    className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg sm:rounded-xl flex items-center justify-center hover:from-red-700 hover:to-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 shadow-lg shadow-red-500/25"
                   >
-                    <Search className="w-5 h-5" />
+                    <Search className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </div>
               </form>
             </div>
 
-            <div className="mb-6">
-              <span className="inline-block px-4 py-2 bg-gradient-to-r from-red-600/20 to-red-500/20 border border-red-500/30 rounded-full text-red-300 text-sm font-semibold backdrop-blur-sm">
+            <div className="mb-4 sm:mb-6">
+              <span className="inline-block px-3 sm:px-4 py-1 sm:py-2 bg-gradient-to-r from-red-600/20 to-red-500/20 border border-red-500/30 rounded-full text-red-300 text-xs sm:text-sm font-semibold backdrop-blur-sm">
                 #1 Trending This Week
               </span>
             </div>
             
-            <h1 className="text-6xl md:text-7xl font-black mb-6 text-white leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black mb-4 sm:mb-6 text-white leading-tight">
               {currentMovie.title}
             </h1>
             
-            <div className="flex items-center gap-6 mb-8 text-gray-300">
-              <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full border border-red-800/30">
-                <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                <span className="font-bold text-lg text-white">{currentMovie.vote_average.toFixed(1)}</span>
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8 text-gray-300">
+              <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full border border-red-800/30">
+                <Star className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400 fill-current" />
+                <span className="font-bold text-base sm:text-lg text-white">{currentMovie.vote_average.toFixed(1)}</span>
                 <span className="text-gray-400">/10</span>
               </div>
-              <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-4 py-2 rounded-full border border-red-800/30">
-                <Calendar className="w-5 h-5 text-red-400" />
+              <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full border border-red-800/30">
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
                 <span className="font-semibold text-white">{getYear(currentMovie.release_date)}</span>
               </div>
             </div>
 
-            <p className="text-xl text-gray-200 mb-10 leading-relaxed line-clamp-3 max-w-2xl">
+            <p className="text-base sm:text-lg md:text-xl text-gray-200 mb-6 sm:mb-8 md:mb-10 leading-relaxed line-clamp-3 max-w-2xl">
               {currentMovie.overview}
             </p>
 
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <button
                 onClick={() => onMovieClick(currentMovie.id)}
-                className="bg-gradient-to-r from-red-600 to-red-500 text-white px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:from-red-700 hover:to-red-600 transition-all duration-200 shadow-lg shadow-red-500/25 hover:shadow-red-500/40 transform hover:scale-105"
+                className="bg-gradient-to-r from-red-600 to-red-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold flex items-center justify-center gap-2 sm:gap-3 hover:from-red-700 hover:to-red-600 transition-all duration-200 shadow-lg shadow-red-500/25 hover:shadow-red-500/40 transform hover:scale-105"
               >
-                <Info className="w-6 h-6" />
+                <Info className="w-5 h-5 sm:w-6 sm:h-6" />
                 More Details
               </button>
-              <button className="bg-black/40 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:bg-black/60 transition-all duration-200 border border-red-800/30">
-                <Play className="w-6 h-6" />
+              <button className="bg-black/40 backdrop-blur-sm text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold flex items-center justify-center gap-2 sm:gap-3 hover:bg-black/60 transition-all duration-200 border border-red-800/30">
+                <Play className="w-5 h-5 sm:w-6 sm:h-6" />
                 Watch Trailer
               </button>
             </div>
 
             {/* Quick AI Features */}
-            <div className="mt-8 flex gap-3">
+            <div className="mt-6 sm:mt-8 flex flex-wrap gap-2 sm:gap-3">
               <button
                 onClick={onShowMovieDNA}
-                className="px-6 py-3 bg-blue-600/20 border border-blue-500/30 text-blue-300 rounded-xl hover:bg-blue-600/30 transition-all duration-200 flex items-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600/20 border border-blue-500/30 text-blue-300 rounded-lg sm:rounded-xl hover:bg-blue-600/30 transition-all duration-200 flex items-center gap-2 text-sm sm:text-base"
               >
-                <Brain className="w-5 h-5" />
-                Movie DNA
+                <Brain className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Movie DNA</span>
+                <span className="sm:hidden">DNA</span>
               </button>
               <button
                 onClick={onShowSmartRecommendations}
-                className="px-6 py-3 bg-green-600/20 border border-green-500/30 text-green-300 rounded-xl hover:bg-green-600/30 transition-all duration-200 flex items-center gap-2"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-green-600/20 border border-green-500/30 text-green-300 rounded-lg sm:rounded-xl hover:bg-green-600/30 transition-all duration-200 flex items-center gap-2 text-sm sm:text-base"
               >
-                <Zap className="w-5 h-5" />
-                Smart Picks
+                <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Smart Picks</span>
+                <span className="sm:hidden">Picks</span>
               </button>
             </div>
           </div>
@@ -220,14 +222,14 @@ export const Hero: React.FC<HeroProps> = ({
           {/* Close Button */}
           <button
             onClick={() => onQueryChange('')}
-            className="fixed top-6 right-6 w-12 h-12 bg-black/50 backdrop-blur-sm text-white rounded-xl flex items-center justify-center hover:bg-black/70 transition-all duration-200 hover:scale-110 border border-red-800/30 z-50"
+            className="fixed top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 sm:w-12 sm:h-12 bg-black/50 backdrop-blur-sm text-white rounded-lg sm:rounded-xl flex items-center justify-center hover:bg-black/70 transition-all duration-200 hover:scale-110 border border-red-800/30 z-50"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
           
-          <div className="container mx-auto px-4 py-8 pt-24">
+          <div className="container mx-auto px-4 py-6 sm:py-8 pt-20 sm:pt-24">
             <div className="text-center mb-8">
-              <h3 className="text-3xl font-bold text-white mb-4">
+              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">
                 {loading ? 'Searching...' : `Search Results for "${searchQuery}"`}
               </h3>
               
@@ -244,7 +246,7 @@ export const Hero: React.FC<HeroProps> = ({
               )}
               
               {!loading && !error && (
-                <p className="text-gray-300 text-lg">
+                <p className="text-gray-300 text-base sm:text-lg">
                   Found {searchResults.length} results
                 </p>
               )}
@@ -254,7 +256,7 @@ export const Hero: React.FC<HeroProps> = ({
                   onQueryChange('');
                   onSetShowSearchResults(false);
                 }}
-                className="mt-4 px-6 py-2 bg-red-600/20 border border-red-500/30 text-red-300 rounded-xl hover:bg-red-600/30 transition-all duration-200"
+                className="mt-4 px-4 sm:px-6 py-2 bg-red-600/20 border border-red-500/30 text-red-300 rounded-lg sm:rounded-xl hover:bg-red-600/30 transition-all duration-200 text-sm sm:text-base"
               >
                 Clear Search
               </button>
@@ -272,11 +274,11 @@ export const Hero: React.FC<HeroProps> = ({
             
             {!loading && !error && searchResults.length === 0 && searchQuery.trim() && (
               <div className="text-center py-20">
-                <div className="w-24 h-24 bg-gradient-to-r from-red-600/20 to-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-6 border border-red-800/30">
-                  <Search className="w-12 h-12 text-red-400" />
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-r from-red-600/20 to-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-6 border border-red-800/30">
+                  <Search className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-red-400" />
                 </div>
-                <h3 className="text-3xl font-bold text-white mb-4">No Results Found</h3>
-                <p className="text-gray-300 text-lg max-w-md mx-auto leading-relaxed">
+                <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4">No Results Found</h3>
+                <p className="text-gray-300 text-base sm:text-lg max-w-md mx-auto leading-relaxed px-4">
                   Try adjusting your search terms or explore our trending movies instead
                 </p>
               </div>
@@ -286,14 +288,14 @@ export const Hero: React.FC<HeroProps> = ({
       )}
       {/* Carousel Indicators */}
       {!showSearchResults && (
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-3">
+        <div className="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 sm:gap-3">
         {trendingMovies.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
               index === currentIndex 
-                ? 'bg-gradient-to-r from-red-600 to-red-500 w-8' 
+                ? 'bg-gradient-to-r from-red-600 to-red-500 w-6 sm:w-8' 
                 : 'bg-white/30 hover:bg-white/50'
             }`}
           />
