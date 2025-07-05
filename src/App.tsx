@@ -44,8 +44,11 @@ function App() {
   }, []);
 
   const loadTrendingMovies = useCallback(async () => {
+    if (loading) return; // Prevent multiple simultaneous calls
+    
     try {
       setLoading(true);
+      setError(null);
       const trending = await getTrendingMovies();
       setTrendingMovies(trending);
     } catch (err) {

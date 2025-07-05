@@ -41,10 +41,34 @@ export const Hero: React.FC<HeroProps> = ({ trendingMovies, onMovieClick }) => {
 
   if (trendingMovies.length === 0) {
     return (
-      <div className="relative h-[80vh] bg-gradient-to-br from-red-900 via-black to-red-950 flex items-center justify-center">
+      <div className="relative h-[60vh] bg-gradient-to-br from-red-900 via-black to-red-950 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-red-500 border-t-transparent mx-auto mb-4"></div>
-          <p className="text-gray-300 text-lg">Loading trending movies...</p>
+          <div className="w-24 h-24 bg-gradient-to-r from-red-600/20 to-red-500/20 rounded-xl flex items-center justify-center mx-auto mb-6 border border-red-800/30">
+            <Search className="w-12 h-12 text-red-400" />
+          </div>
+          <h3 className="text-3xl font-bold text-white mb-4">Welcome to CineVault</h3>
+          <p className="text-gray-300 text-lg max-w-md mx-auto leading-relaxed mb-8">
+            Your ultimate movie watchlist and discovery platform
+          </p>
+          
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto">
+            <form onSubmit={handleSearch}>
+              <div className="relative">
+                <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+                <input
+                  type="text"
+                  placeholder="Search for movies, actors, directors..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-16 pr-6 py-5 bg-black/40 backdrop-blur-sm border border-red-800/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 text-white placeholder-gray-400 transition-all duration-200 text-lg"
+                />
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <VoiceSearchButton onTranscription={handleVoiceTranscription} />
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     );

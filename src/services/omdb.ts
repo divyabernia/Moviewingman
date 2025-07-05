@@ -140,25 +140,25 @@ export const searchMovies = async (query: string): Promise<any[]> => {
 export const getTrendingMovies = async (): Promise<any[]> => {
   // Use OMDb popular movies
   const popularMovies = [
-    'Avengers Endgame', 'Spider-Man', 'The Dark Knight', 'Inception', 'Interstellar',
-    'The Matrix', 'Pulp Fiction', 'The Godfather', 'Forrest Gump', 'Titanic',
-    'Avatar', 'Star Wars', 'Jurassic Park', 'The Lion King', 'Frozen',
-    'Iron Man', 'Black Panther', 'Wonder Woman', 'Aquaman', 'Shazam'
+    'Avengers', 'Spider-Man', 'Batman', 'Superman', 'Iron Man',
+    'Wonder Woman', 'Black Panther', 'Captain America', 'Thor',
+    'Matrix', 'Inception', 'Interstellar', 'Godfather', 'Titanic'
   ];
   
   try {
     console.log('Fetching popular movies from OMDb...');
-    const moviePromises = popularMovies.slice(0, 15).map(async (title, index) => {
+    const moviePromises = popularMovies.slice(0, 10).map(async (title, index) => {
       try {
         const response = await omdbApi.get('', {
           params: {
-            t: title, // Use 't' for exact title search instead of 's'
+            s: title, // Use 's' for search
             type: 'movie',
+            page: 1,
           },
         });
         
-        if (response.data.Response === 'True') {
-          return convertOMDbToMovie(response.data, index);
+        if (response.data.Response === 'True' && response.data.Search && response.data.Search.length > 0) {
+          return convertOMDbToMovie(response.data.Search[0], index);
         }
         return null;
       } catch (error) {
@@ -171,6 +171,10 @@ export const getTrendingMovies = async (): Promise<any[]> => {
     const validResults = results.filter(movie => movie !== null);
     
     console.log('Popular movies fetched from OMDb:', validResults.length);
+    
+    if (validResults.length === 0) {
+      throw new Error('No trending movies found');
+    }
     return validResults;
   } catch (error) {
     console.error('Error fetching trending movies:', error);
