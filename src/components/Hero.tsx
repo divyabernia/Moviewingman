@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Info, Star, Calendar, Search } from 'lucide-react';
 import { Movie } from '../types/movie';
-import { getImageUrl, getYear } from '../services/tmdb';
+import { getImageUrl, getYear } from '../services/omdb';
 
 interface HeroProps {
   trendingMovies: Movie[];
@@ -48,7 +48,7 @@ export const Hero: React.FC<HeroProps> = ({ trendingMovies, onMovieClick }) => {
       <div 
         className="absolute inset-0 bg-cover bg-center transition-all duration-1000 scale-105"
         style={{
-          backgroundImage: `url(${getImageUrl(currentMovie.backdrop_path, 'original')})`,
+          backgroundImage: `url(${getImageUrl(currentMovie.backdrop_path)})`,
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />

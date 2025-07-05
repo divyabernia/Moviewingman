@@ -1,7 +1,7 @@
 import React from 'react';
 import { Star, Plus, Check, Trash2, Calendar, Eye, Heart } from 'lucide-react';
 import { Movie } from '../types/movie';
-import { getImageUrl, getYear } from '../services/tmdb';
+import { getImageUrl, getYear } from '../services/omdb';
 
 interface MovieCardProps {
   movie: Movie;

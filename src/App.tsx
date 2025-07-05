@@ -8,7 +8,7 @@ import { TrendingSection } from './components/TrendingSection';
 import { ActorProfile } from './components/ActorProfile';
 import { LoginScreen } from './components/LoginScreen';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { searchMovies, getTrendingMovies, getMovieDetails, getPersonDetails } from './services/tmdb';
+import { searchMovies, getTrendingMovies, getMovieDetails, getPersonDetails } from './services/omdb';
 import { Movie, MovieDetails as MovieDetailsType, Person } from './types/movie';
 
 function App() {

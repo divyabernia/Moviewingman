@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Star, Calendar, Clock, Plus, Trash2, Play, Users, Award, Globe, DollarSign, Trophy, Film } from 'lucide-react';
 import { MovieDetails as MovieDetailsType, Movie } from '../types/movie';
-import { getImageUrl, getYear, formatRuntime } from '../services/tmdb';
+import { getImageUrl, getYear, formatRuntime } from '../services/omdb';
 import { OMDbMovie } from '../services/omdb';
 
 interface MovieDetailsProps {
@@ -44,7 +44,7 @@ export const MovieDetails: React.FC<MovieDetailsProps> = ({
             {/* Header with backdrop */}
             <div className="relative h-80 md:h-96">
               <img
-                src={getImageUrl(movie.backdrop_path, 'original')}
+                src={getImageUrl(movie.backdrop_path)}
                 alt={movie.title}
                 className="w-full h-full object-cover"
                 onError={handleImageError}

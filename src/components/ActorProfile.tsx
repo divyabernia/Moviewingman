@@ -1,7 +1,7 @@
 import React from 'react';
 import { X, Calendar, MapPin, Star, Film } from 'lucide-react';
 import { Person } from '../types/movie';
-import { getImageUrl, getYear } from '../services/tmdb';
+import { getImageUrl, getYear } from '../services/omdb';
 
 interface ActorProfileProps {
   person: Person;
